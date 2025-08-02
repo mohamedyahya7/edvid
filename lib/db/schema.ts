@@ -53,6 +53,11 @@ export const createTablesSQL = `
     subtitle_path TEXT,
     is_unlocked INTEGER DEFAULT 0,
     downloaded_size_bytes INTEGER,
+    download_status TEXT DEFAULT 'NOT_DOWNLOADED',
+    local_video_path TEXT,
+    local_audio_path TEXT,
+    local_subtitle_path TEXT,
+    total_size_bytes INTEGER,
     progress_seconds INTEGER DEFAULT 0,
     is_favorite INTEGER DEFAULT 0,
     duration_seconds INTEGER,
@@ -65,6 +70,7 @@ export const createTablesSQL = `
   CREATE TABLE IF NOT EXISTS used_codes (
     id TEXT PRIMARY KEY NOT NULL,
     video_id TEXT NOT NULL,
+    download_status TEXT NOT NULL,
     used_at TEXT NOT NULL,
     FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE
   );

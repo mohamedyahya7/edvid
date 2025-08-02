@@ -1,17 +1,22 @@
 import { useExploreScreen } from "@/hooks/useExploreScreen";
 import { Link, useRouter } from "expo-router";
-import React from "react";
+import * as Updates from "expo-updates";
+import i18next from "i18next";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
+  I18nManager,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   View,
 } from "react-native";
 import HorizontalCard from "../../components/clubs/HorizontalCard";
+import ActivationModal from "../components/ActivationModal";
 
 const Chip = ({
   label,
@@ -49,44 +54,75 @@ const ExploreScreenHeader = ({
   selectedTeacherIds: string[];
   toggleTeacherFilter: (id: string) => void;
 }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const { t } = useTranslation();
   const router = useRouter();
   const selectedSubject = subjects.find((s) => s.id === selectedSubjectId);
 
+  const teacherNames = suggestedTeachers
+    .filter((t) => selectedTeacherIds.includes(t.id))
+    .map((t) => t.name)
+    .join(", ");
+
+  const changeLang = async () => {
+    const newLang = i18next.language.startsWith("ar") ? "en" : "ar";
+    await i18next.changeLanguage(newLang);
+    const isRTL = newLang.startsWith("ar");
+    if (isRTL !== I18nManager.isRTL) {
+      I18nManager.forceRTL(isRTL);
+      await Updates.reloadAsync();
+    }
+  };
+
   return (
     <>
+      <ActivationModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
+      {/* Language Switcher Button (Temporary) */}
+      <TouchableOpacity onPress={changeLang} style={styles.langSwitcher}>
+        <Text style={styles.langSwitcherText}>
+          {i18next.language.startsWith("ar")
+            ? "Switch to English"
+            : "التحويل للعربية"}
+        </Text>
+      </TouchableOpacity>
       {/* Video Code Input */}
-      {(selectedSubjectId || selectedTeacherIds.length > 0) ? (
+      {selectedSubjectId || selectedTeacherIds.length > 0 ? (
         <View style={styles.filterInfoContainer}>
           <Text style={styles.filterInfoText}>
-            فلترة بـ:
-            {selectedSubject?.title}
-            {selectedTeacherIds.length > 0
-              ? ` | ${suggestedTeachers
-                  .filter((t) => selectedTeacherIds.includes(t.id))
-                  .map((t) => t.name)
-                  .join(", ")}`
-              : ""}
+            {t("explore.filteringBy", {
+              subject: selectedSubject?.title,
+              teachers: teacherNames ? ` | ${teacherNames}` : "",
+            })}
           </Text>
           <TouchableOpacity onPress={clearFilters}>
-            <Text style={styles.clearFilterText}>إزالة الفلاتر</Text>
+            <Text style={styles.clearFilterText}>
+              {t("explore.clearFilters")}
+            </Text>
           </TouchableOpacity>
         </View>
-      ) :
-       
-      <View style={styles.inputRow}>
-        <TextInput
-          placeholder="🎁 معك كود الفيديو؟"
-          style={styles.input}
-          textAlign="right"
-        />
-        <TouchableOpacity style={styles.inputButton}>
-          <Text style={styles.inputButtonText}>📥 </Text>
-        </TouchableOpacity>
-      </View>
-       }
+      ) : (
+        <View style={styles.inputRow}>
+          <TextInput
+            placeholder={t("explore.videoCodePlaceholder")}
+            style={styles.input}
+            textAlign={I18nManager.isRTL ? "right" : "left"}
+          />
+          <TouchableOpacity
+            style={styles.inputButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.inputButtonText}>
+              {t("explore.videoCodeButton")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Study Subjects */}
-      <SectionHeader title="🧪 المواد الدراسية" />
+      <SectionHeader title={t("explore.studySubjects")} />
       <View style={styles.chipContainer}>
         {subjects.map((subject) => (
           <Chip
@@ -98,14 +134,16 @@ const ExploreScreenHeader = ({
         ))}
       </View>
 
-      
-
       {/* Suggested Teachers */}
       <SectionHeader
-        title="👨‍🏫 مدرسين مقترحين"
+        title={t("explore.suggestedTeachers")}
         onShowAll={() => router.push("/all-teachers")}
       />
-      <ScrollView style={styles.row} horizontal showsHorizontalScrollIndicator={false}>
+      <ScrollView
+        style={styles.row}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      >
         {suggestedTeachers.slice(0, 5).map((teacher) => (
           <Chip
             key={teacher.id}
@@ -126,12 +164,13 @@ const ExploreScreenHeader = ({
       </ScrollView>
 
       {/* Free Videos Header */}
-      <SectionHeader title="🎁 فيديوهات مجانية" />
+      <SectionHeader title={t("explore.freeVideos")} />
     </>
   );
 };
 
 export default function ExploreScreen() {
+  const { t } = useTranslation();
   const {
     subjects,
     suggestedTeachers,
@@ -173,7 +212,7 @@ export default function ExploreScreen() {
                 item={{
                   title: video.title,
                   image: `https://img.youtube.com/vi/${video.youtube_id}/0.jpg`,
-                  members: "مجاني",
+                  members: t("explore.free"),
                   activity: "",
                 }}
               />
@@ -213,12 +252,13 @@ function SectionHeader({
   title: string;
   onShowAll?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {onShowAll && (
         <TouchableOpacity onPress={onShowAll}>
-          <Text style={styles.showAll}>→ عرض الكل</Text>
+          <Text style={styles.showAll}>{t("explore.showAll")}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -227,6 +267,18 @@ function SectionHeader({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f9f9f9" },
+  langSwitcher: {
+    backgroundColor: "#e0e7ff",
+    padding: 10,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginTop: 16,
+    alignItems: "center",
+  },
+  langSwitcherText: {
+    fontWeight: "bold",
+    color: "#4338ca",
+  },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -242,7 +294,8 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
-    marginLeft: 8,
+    marginLeft: I18nManager.isRTL ? 0 : 8,
+    marginRight: I18nManager.isRTL ? 8 : 0,
   },
   inputButton: {
     backgroundColor: "#4a90e2",
@@ -259,10 +312,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionTitle: { fontSize: 16, fontWeight: "bold" },
-  showAll: { color: "#4a90e2", fontWeight: "bold" },
-  row: { marginHorizontal: 16, marginBottom: 8, flexDirection: "row" },
+  showAll: {
+    color: "#4a90e2",
+    fontWeight: "bold",
+    transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
+  },
+  row: {
+    marginHorizontal: 16,
+    marginBottom: 8,
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+  },
   chipContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     flexWrap: "wrap",
     marginHorizontal: 16,
     marginBottom: 8,
@@ -272,7 +333,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    marginRight: 8,
+    marginLeft: I18nManager.isRTL ? 8 : 0,
+    marginRight: I18nManager.isRTL ? 0 : 8,
     marginBottom: 8,
   },
   chipSelected: {
@@ -296,6 +358,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: "#333",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   clearFilterText: {
     fontSize: 14,
@@ -311,6 +374,7 @@ const styles = StyleSheet.create({
   videoCardContainer: {
     width: "48%", // Two columns with a little space
     marginBottom: 16,
-    marginRight: "4%",
+    marginRight: I18nManager.isRTL ? 0 : "4%",
+    marginLeft: I18nManager.isRTL ? "4%" : 0,
   },
 });

@@ -5,13 +5,17 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import * as Notifications from "expo-notifications";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SQLiteProvider } from "expo-sqlite";
 import React, { Suspense, useEffect } from "react";
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import "react-native-reanimated";
 
+import "@/app/i18n"; // Import to initialize i18next
+import "@/app/tasks/downloadTask"; // Import to register the background task
+import { registerBackgroundFetchAsync } from "@/app/tasks/downloadTask";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { databaseService } from "@/lib/DatabaseService";
 import { useAppStore } from "@/lib/store";
@@ -63,6 +67,10 @@ const InitialLayout = () => {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const { initializeDownloadManagerListener } = useAppStore(
+    (state) => state.actions
+  );
+
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -72,6 +80,30 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    initializeDownloadManagerListener();
+
+    const requestNotificationPermissions = async () => {
+      if (Platform.OS === "android") {
+        await Notifications.setNotificationChannelAsync("default", {
+          name: "default",
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: "#FF231F7C",
+        });
+      }
+
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+    };
+
+    requestNotificationPermissions();
+    registerBackgroundFetchAsync();
+  }, []);
 
   if (!loaded) {
     return null;

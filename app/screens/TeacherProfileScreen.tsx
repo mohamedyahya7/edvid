@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
+  I18nManager,
   Image,
   ScrollView,
   StyleSheet,
@@ -53,7 +54,11 @@ export default function TeacherProfileScreen() {
         <Ionicons name="close" size={24} color="white" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.uploadButton}>
-        <Ionicons name="share-outline" size={24} color="white" />
+        <Ionicons
+          name={I18nManager.isRTL ? "arrow-undo-outline" : "share-outline"}
+          size={24}
+          color="white"
+        />
       </TouchableOpacity>
 
       <View style={styles.headerContent}>
@@ -133,7 +138,8 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     top: 40,
-    left: 20,
+    left: I18nManager.isRTL ? undefined : 20,
+    right: I18nManager.isRTL ? 20 : undefined,
     backgroundColor: "rgba(0,0,0,0.5)",
     padding: 8,
     borderRadius: 20,
@@ -141,23 +147,27 @@ const styles = StyleSheet.create({
   uploadButton: {
     position: "absolute",
     top: 40,
-    right: 20,
+    right: I18nManager.isRTL ? undefined : 20,
+    left: I18nManager.isRTL ? 20 : undefined,
     backgroundColor: "rgba(0,0,0,0.5)",
     padding: 8,
     borderRadius: 20,
   },
   headerContent: {
     padding: 20,
+    alignItems: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
   teacherName: {
     color: "#fff",
     fontSize: 32,
     fontWeight: "bold",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   courseTitle: {
     color: "#fff",
     fontSize: 18,
     marginTop: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   startClassButton: {
     backgroundColor: "#e50914",
@@ -172,7 +182,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   actionsRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-around",
     padding: 20,
   },
@@ -184,7 +194,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   tabBar: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-around",
     borderBottomWidth: 1,
     borderBottomColor: "#222",
@@ -203,21 +213,24 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   lessonRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     marginBottom: 20,
   },
   lessonNumber: {
     color: "#888",
     fontSize: 18,
-    marginRight: 15,
+    marginRight: I18nManager.isRTL ? 0 : 15,
+    marginLeft: I18nManager.isRTL ? 15 : 0,
   },
   lessonTitle: {
     color: "#fff",
     fontSize: 16,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   lessonDuration: {
     color: "#888",
     fontSize: 12,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
 });

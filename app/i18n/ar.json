@@ -1,0 +1,13 @@
+{
+  "explore": {
+    "videoCodePlaceholder": "🎁 معك كود الفيديو؟",
+    "videoCodeButton": "📥",
+    "studySubjects": "🧪 المواد الدراسية",
+    "suggestedTeachers": "👨‍🏫 مدرسين مقترحين",
+    "showAll": "→ عرض الكل",
+    "freeVideos": "🎁 فيديوهات مجانية",
+    "filteringBy": "فلترة بـ: {{subject}}{{teachers}}",
+    "clearFilters": "إزالة الفلاتر",
+    "free": "مجاني"
+  }
+}

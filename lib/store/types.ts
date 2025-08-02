@@ -1,9 +1,12 @@
+import { DownloadTask } from "@/app/services/DownloadManager";
+import { SQLiteDatabase } from "expo-sqlite";
+
 export type Video = {
   id: string;
   title: string;
   course_id: string;
   teacher_id: string;
-  video_type: "free" | "paid";
+  type: "free" | "paid";
   youtube_id?: string;
   video_path?: string;
   audio_path?: string;
@@ -33,18 +36,20 @@ export interface StoreState {
   db: any | null;
   explorePage: number;
   hasMoreExploreVideos: boolean;
+  downloadTasks: Map<string, DownloadTask>;
 }
 
 export interface StoreActions {
   setDb: (db: any) => void;
   setSelectedGradeId: (gradeId: string) => void;
-  fetchCourses: (db: any) => Promise<void>;
+  fetchCourses: (db: SQLiteDatabase, gradeId: string) => Promise<void>;
   fetchExploreData: (db: any) => Promise<void>;
   fetchVideosForCourse: (db: any, courseId: string) => Promise<void>;
   toggleSubjectFilter: (subjectId: string) => void;
   toggleTeacherFilter: (teacherId: string) => void;
   clearFilters: () => void;
   fetchMoreExploreVideos: (db: any) => Promise<void>;
+  initializeDownloadManagerListener: () => void;
 }
 
 // Define the types for our state

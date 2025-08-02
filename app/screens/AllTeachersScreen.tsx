@@ -4,6 +4,7 @@ import { Link, useNavigation } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
+  I18nManager,
   Image,
   SectionList,
   StyleSheet,
@@ -27,7 +28,11 @@ const TeacherItem = ({ item }: { item: any }) => (
           {item.bio}
         </Text>
       </View>
-      <Ionicons name="chevron-forward" size={24} color="#ccc" />
+      <Ionicons
+        name={I18nManager.isRTL ? "chevron-back" : "chevron-forward"}
+        size={24}
+        color="#ccc"
+      />
     </TouchableOpacity>
   </Link>
 );
@@ -48,7 +53,11 @@ export default function AllTeachersScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons
+            name={I18nManager.isRTL ? "arrow-forward" : "arrow-back"}
+            size={24}
+            color="black"
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>كل المدرسين</Text>
         <View style={{ width: 24 }} />
@@ -77,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
@@ -99,9 +108,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     paddingVertical: 8,
     paddingHorizontal: 0,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   teacherCard: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -117,18 +127,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 16,
+    marginRight: I18nManager.isRTL ? 0 : 16,
+    marginLeft: I18nManager.isRTL ? 16 : 0,
   },
   teacherInfo: {
     flex: 1,
+    alignItems: I18nManager.isRTL ? "flex-end" : "flex-start",
   },
   teacherName: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 4,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   teacherBio: {
     fontSize: 14,
     color: "#666",
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
 });

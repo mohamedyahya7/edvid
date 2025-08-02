@@ -1,0 +1,13 @@
+{
+  "explore": {
+    "videoCodePlaceholder": "🎁 Have a video code?",
+    "videoCodeButton": "📥",
+    "studySubjects": "🧪 Study Subjects",
+    "suggestedTeachers": "👨‍🏫 Suggested Teachers",
+    "showAll": "Show All →",
+    "freeVideos": "🎁 Free Videos",
+    "filteringBy": "Filtering by: {{subject}}{{teachers}}",
+    "clearFilters": "Clear Filters",
+    "free": "Free"
+  }
+}

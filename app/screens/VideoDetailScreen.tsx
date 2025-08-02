@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  I18nManager,
   Image,
   Modal,
   ScrollView,
@@ -37,7 +38,6 @@ export default function VideoDetailScreen() {
   };
 
   if (isLoading) {
-    
     return <ActivityIndicator style={{ flex: 1, backgroundColor: "#111" }} />;
   }
 
@@ -119,7 +119,10 @@ export default function VideoDetailScreen() {
 
       {/* Action Buttons */}
       <View style={styles.actionsRow}>
-        <ActionButton icon="share-outline" label="Share" />
+        <ActionButton
+          icon={I18nManager.isRTL ? "arrow-undo-outline" : "share-outline"}
+          label="Share"
+        />
         <ActionButton icon="bookmark-outline" label="Bookmark" />
         <ActionButton icon="download-outline" label="Download" />
       </View>
@@ -182,7 +185,10 @@ export default function VideoDetailScreen() {
               </Text>
             </TouchableOpacity>
           )}
-          contentContainerStyle={{ paddingHorizontal: 16 }}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+          }}
         />
       </View>
 
@@ -249,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   actionsRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "space-around",
     marginVertical: 16,
   },
@@ -261,11 +267,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginHorizontal: 16,
     marginBottom: 8,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
-  description: { color: "#ccc", marginHorizontal: 16, marginBottom: 16 },
-  classPage: { color: "#4a90e2", marginHorizontal: 16, marginBottom: 16 },
+  description: {
+    color: "#ccc",
+    marginHorizontal: 16,
+    marginBottom: 16,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  classPage: {
+    color: "#4a90e2",
+    marginHorizontal: 16,
+    marginBottom: 16,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
   teacherInfoContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     padding: 16,
     backgroundColor: "#1a1a1a",
@@ -277,36 +294,59 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    marginRight: 12,
+    marginRight: I18nManager.isRTL ? 0 : 12,
+    marginLeft: I18nManager.isRTL ? 12 : 0,
   },
   teacherName: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   teacherBio: {
     color: "#ccc",
     fontSize: 14,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   tabsRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     borderBottomWidth: 1,
     borderBottomColor: "#222",
     marginHorizontal: 16,
   },
-  tab: { color: "#aaa", marginRight: 24, paddingVertical: 8 },
+  tab: {
+    color: "#aaa",
+    marginRight: I18nManager.isRTL ? 0 : 24,
+    marginLeft: I18nManager.isRTL ? 24 : 0,
+    paddingVertical: 8,
+  },
   activeTab: { color: "#fff", borderBottomWidth: 2, borderBottomColor: "#f44" },
   upNextRow: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     margin: 16,
     backgroundColor: "#222",
     borderRadius: 8,
     padding: 8,
   },
-  upNextThumb: { width: 60, height: 40, borderRadius: 4, marginRight: 12 },
-  upNextTitle: { color: "#fff", fontSize: 14 },
-  upNextDuration: { color: "#fff", fontSize: 12, marginLeft: 8 },
+  upNextThumb: {
+    width: 60,
+    height: 40,
+    borderRadius: 4,
+    marginRight: I18nManager.isRTL ? 0 : 12,
+    marginLeft: I18nManager.isRTL ? 12 : 0,
+  },
+  upNextTitle: {
+    color: "#fff",
+    fontSize: 14,
+    textAlign: I18nManager.isRTL ? "right" : "left",
+  },
+  upNextDuration: {
+    color: "#fff",
+    fontSize: 12,
+    marginLeft: I18nManager.isRTL ? 0 : 8,
+    marginRight: I18nManager.isRTL ? 8 : 0,
+  },
   otherVideosTitle: {
     color: "#fff",
     fontSize: 18,
@@ -314,10 +354,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 12,
     marginTop: 16,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   otherVideoCard: {
     width: 150,
-    marginRight: 10,
+    marginRight: I18nManager.isRTL ? 0 : 10,
+    marginLeft: I18nManager.isRTL ? 10 : 0,
   },
   otherVideoImage: {
     width: "100%",
@@ -329,6 +371,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginTop: 6,
     fontSize: 14,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
   centeredView: {
     flex: 1,
@@ -383,5 +426,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: "100%",
     borderRadius: 5,
+    textAlign: I18nManager.isRTL ? "right" : "left",
   },
 });
