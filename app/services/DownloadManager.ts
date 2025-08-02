@@ -1,5 +1,6 @@
 import * as FileSystem from "expo-file-system";
 import { type SQLiteDatabase } from "expo-sqlite";
+import { ActivationService } from "../api/ActivationService";
 
 /**
  * Represents a single download task managed by the DownloadManager.
@@ -8,6 +9,7 @@ import { type SQLiteDatabase } from "expo-sqlite";
 export interface DownloadTask {
   videoId: string;
   videoTitle: string; // Added for notification purposes
+  code: string; // The activation code used for the download
   videoUrl: string;
   audioUrl?: string;
   subtitleUrl?: string;
@@ -68,11 +70,13 @@ class DownloadManager {
    * Adds a new video to the download queue.
    * @param videoId The ID of the video to download.
    * @param videoTitle The title of the video for notifications.
+   * @param code The activation code for the download.
    * @param urls The URLs for the video, audio, and subtitle files.
    */
   public async enqueueDownload(
     videoId: string,
     videoTitle: string,
+    code: string,
     urls: { videoUrl: string; audioUrl?: string; subtitleUrl?: string }
   ) {
     if (this.activeTasks.has(videoId) || this.downloadQueue.includes(videoId)) {
@@ -80,10 +84,53 @@ class DownloadManager {
       return;
     }
 
+    if (!this.db) {
+      console.error("Database is not set in DownloadManager.");
+      return;
+    }
+
+    // Check if the video is already downloaded
+    try {
+      const videoData = await this.db.getFirstAsync<{
+        download_status: string;
+        local_video_path: string;
+      }>(
+        "SELECT download_status, local_video_path FROM videos WHERE id = ?;",
+        videoId
+      );
+
+      if (
+        videoData &&
+        videoData.download_status === "COMPLETED" &&
+        videoData.local_video_path
+      ) {
+        const fileInfo = await FileSystem.getInfoAsync(
+          videoData.local_video_path
+        );
+        if (fileInfo.exists) {
+          console.log(
+            `Video ${videoId} is already downloaded and file exists.`
+          );
+          return; // Already downloaded
+        } else {
+          console.log(
+            `Video ${videoId} marked as COMPLETED but file is missing. Re-downloading.`
+          );
+        }
+      }
+    } catch (error) {
+      console.error(
+        `Error checking database for existing download of video ${videoId}:`,
+        error
+      );
+      // Decide if we should still proceed or not. For now, let's proceed.
+    }
+
     // This needs to be fetched from the API response in a real scenario
     const task: DownloadTask = {
       videoId,
       videoTitle, // Store the title
+      code, // Store the code
       videoUrl: urls.videoUrl,
       audioUrl: urls.audioUrl,
       subtitleUrl: urls.subtitleUrl,
@@ -95,11 +142,6 @@ class DownloadManager {
       subtitleProgress: { downloadedBytes: 0, totalBytes: 0 },
     };
     this.activeTasks.set(videoId, task);
-
-    if (!this.db) {
-      console.error("Database is not set in DownloadManager.");
-      return;
-    }
 
     console.log(`Enqueuing video ${videoId} for download.`);
     try {
@@ -194,17 +236,17 @@ class DownloadManager {
         (audioResult === undefined || audioResult?.status === 200)
       ) {
         // Download completed
-        await this.onDownloadCompleted(task.videoId, {
+        await this.onDownloadCompleted(task, {
           videoFileUri,
           audioFileUri,
         });
       } else {
         // Download failed
-        await this.onDownloadFailed(task.videoId);
+        await this.onDownloadFailed(task.videoId,task.code);
       }
     } catch (error) {
       console.error(`Error downloading video ${task.videoId}:`, error);
-      await this.onDownloadFailed(task.videoId);
+      await this.onDownloadFailed(task.videoId,task.code);
     }
   }
 
@@ -233,34 +275,64 @@ class DownloadManager {
   }
 
   private async onDownloadCompleted(
-    videoId: string,
+    task: DownloadTask,
     paths: {
       videoFileUri: string;
       audioFileUri?: string;
       subtitleFileUri?: string;
     }
   ) {
-    if (!this.db) return;
-    console.log(`Download completed for video ${videoId}.`);
-    const task = this.activeTasks.get(videoId);
+    if (!this.db) {
+      console.error("Database not set, cannot update on download completion.");
+      return;
+    }
+    console.log(
+      `Download completed for video ${task.videoId}. Updating database...`
+    );
+    
     if (task) {
       task.status = "completed";
+      task.progress = 100;
     }
 
-    await this.db.runAsync(
-      "UPDATE videos SET download_status = 'COMPLETED', local_video_path = ?, local_audio_path = ? , local_subtitle_path = ? WHERE id = ?;",
-      paths.videoFileUri,
-      paths.audioFileUri ?? null,
-      paths.subtitleFileUri ?? null,
-      videoId
-    );
+    try {
+      const result = await this.db.runAsync(
+        "UPDATE videos SET download_status = 'COMPLETED', local_video_path = ?, local_audio_path = ? , local_subtitle_path = ? WHERE id = ?;",
+        paths.videoFileUri,
+        paths.audioFileUri ?? null,
+        paths.subtitleFileUri ?? null,
+        task.videoId
+      );
+      const r = await ActivationService.notifyDownloadComplete(task.code);
+      if (r) {
+        console.log(`Download complete form donload manager`);
+        alert(r.message);
+        console.log(r);
+      }
+      if (result.changes > 0) {
+        console.log(
+          `Database updated successfully for video ${task.videoId}. Rows affected: ${result.changes}`
+        );
+        // Notify the API that the download is complete
+        
+      } else {
+        console.warn(
+          `Database update for video ${task.videoId} did not affect any rows.`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Failed to update database for completed download of video ${task.videoId}:`,
+        error
+      );
+    }
 
-    this.activeTasks.delete(videoId);
+    this.activeTasks.delete(task.videoId);
     this.notifyUpdates(); // Notify UI that the task is finished
     this.processQueue();
   }
 
-  private async onDownloadFailed(videoId: string) {
+  private async onDownloadFailed(   videoId:string , code:string) {
     if (!this.db) return;
     console.error(`Download failed for video ${videoId}.`);
     const task = this.activeTasks.get(videoId);
@@ -273,7 +345,7 @@ class DownloadManager {
       "UPDATE videos SET download_status = 'FAILED' WHERE id = ?;",
       videoId
     );
-
+    await ActivationService.notifyDownloadFailed(code);
     this.activeTasks.delete(videoId);
     this.notifyUpdates(); // Notify UI that the task failed
     this.processQueue();

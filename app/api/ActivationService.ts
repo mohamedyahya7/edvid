@@ -114,9 +114,91 @@ const requestDownloadLinks = async (
   }
 };
 
+const notifyDownloadComplete = async (
+  code: string
+): Promise<{ success: boolean; message?: string }> => {
+  if (!deviceId) {
+    return {
+      success: false,
+      message: "Could not retrieve device identifier.",
+    };
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/downloads/complete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code, device_id: deviceId }),
+    });
+
+    const r = await response.json();
+    if (!r) {
+      return {
+        success: false,
+        message:
+          r.message ||
+          "An error occurred while notifying download completion.",
+      };
+    }
+    console.log(r);
+    
+
+    console.log("Successfully notified API of download completion.");
+    return r;
+  } catch (error) {
+    console.error("Network or parsing error in notifyDownloadComplete:", error);
+    return {
+      success: false,
+      message: "A network error occurred. Please try again.",
+    };
+  }
+};
+const notifyDownloadFailed = async (
+  code: string
+): Promise<{ success: boolean; message?: string }> => {
+  if (!deviceId) {
+    return {
+      success: false,
+      message: "Could not retrieve device identifier.",
+    };
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/downloads/failed`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code, device_id: deviceId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        message:
+          errorData.message ||
+          "An error occurred while notifying download filed.",
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Network or parsing error in notifyDownloadfiled:", error);
+    return {
+      success: false,
+      message: "A network error occurred. Please try again.",
+    };
+  }
+};
+
 export const ActivationService = {
   checkActivationCode,
   requestDownloadLinks,
+  notifyDownloadComplete,
+  notifyDownloadFailed
 };
 
 export default {};

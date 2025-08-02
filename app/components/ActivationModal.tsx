@@ -69,11 +69,16 @@ const ActivationModal = ({
 
     if ("url" in response) {
       // TODO: Integrate with the actual Download Manager
-      downloadManager.enqueueDownload(response.video_id, response.video_title, {
-        videoUrl: response.url,
-        audioUrl: response.audio_url,
-        subtitleUrl: response.subtitle_url,
-      });
+      downloadManager.enqueueDownload(
+        String(response.video_id),
+        response.video_title,
+        code,
+        {
+          videoUrl: response.url,
+          audioUrl: response.audio_url,
+          subtitleUrl: response.subtitle_url,
+        }
+      );
 
       Alert.alert(
         "Download Queued",
