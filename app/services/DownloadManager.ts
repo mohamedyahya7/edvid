@@ -314,3 +314,4 @@ class DownloadManager {
 
 // Export a singleton instance of the manager
 export const downloadManager = new DownloadManager();
+export default {};

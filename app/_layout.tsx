@@ -113,7 +113,10 @@ export default function RootLayout() {
     <Suspense fallback={<Text>Loading...</Text>}>
       <SQLiteProvider
         databaseName="main.db"
-        onInit={databaseService.initializeDatabase}
+        onInit={async (db) => {
+          await databaseService.initializeDatabase(db);
+          useAppStore.getState().actions.setDb(db);
+        }}
       >
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}

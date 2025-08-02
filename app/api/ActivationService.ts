@@ -118,3 +118,5 @@ export const ActivationService = {
   checkActivationCode,
   requestDownloadLinks,
 };
+
+export default {};

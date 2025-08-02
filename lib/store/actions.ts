@@ -1,3 +1,4 @@
+import { downloadManager } from "@/app/services/DownloadManager";
 import { StateCreator } from "zustand";
 import { databaseService } from "../DatabaseService";
 import { AppState, StoreActions } from "./types";
@@ -117,6 +118,11 @@ export const createActions: StateCreator<
       } catch (error) {
         console.error("Failed to fetch more explore videos:", error);
       }
+    },
+    initializeDownloadManagerListener: () => {
+      downloadManager.setUpdateListener((tasks) => {
+        set({ downloadTasks: new Map(tasks) });
+      });
     },
   },
 });

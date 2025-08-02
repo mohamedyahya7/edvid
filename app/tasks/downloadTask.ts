@@ -49,6 +49,8 @@ TaskManager.defineTask(BACKGROUND_DOWNLOAD_TASK, async () => {
     : BackgroundFetchResult.NoData;
 });
 
+export default {};
+
 /**
  * Registers the background fetch task.
  * This should be called once, when the app starts.

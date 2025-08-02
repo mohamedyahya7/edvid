@@ -7,16 +7,14 @@ import * as gradeQueries from "./db/queries/grade.queries";
 import * as teacherQueries from "./db/queries/teacher.queries";
 import * as videoQueries from "./db/queries/video.queries";
 import { createTablesSQL } from "./db/schema";
-import { useAppStore } from "./store";
 
 const initializeDatabase = async (db: SQLiteDatabase): Promise<void> => {
   await db.execAsync(createTablesSQL);
   console.log("Database tables created successfully.");
 
-  // Set the db connection for the app state and download manager
-  useAppStore.getState().actions.setDb(db);
+  // Set the db connection for the download manager
   downloadManager.setDb(db);
-  console.log("Database connection set for Zustand and DownloadManager.");
+  console.log("Database connection set for DownloadManager.");
 
   const mockDataSQL = generateMockDataSQL();
   await db.execAsync(mockDataSQL);
@@ -27,7 +25,7 @@ export const databaseService = {
   initializeDatabase,
   ...gradeQueries,
   ...courseQueries,
-  ...teacherQueries,
-  ...videoQueries,
   ...exploreQueries,
+  ...videoQueries,
+  ...teacherQueries,
 };
