@@ -1,179 +1,38 @@
-import { useExploreScreen } from "@/hooks/useExploreScreen";
-import { Link, useRouter } from "expo-router";
-import * as Updates from "expo-updates";
-import i18next from "i18next";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  I18nManager,
-  ScrollView,
+  RefreshControl,
   StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
   View,
-} from "react-native";
-import HorizontalCard from "../../components/clubs/HorizontalCard";
-import ActivationModal from "../components/ActivationModal";
+  Text,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useIsFocused, useTheme } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
-const Chip = ({
-  label,
-  onPress,
-  isSelected,
-}: {
-  label: string;
-  onPress: () => void;
-  isSelected: boolean;
-}) => (
-  <TouchableOpacity
-    style={[styles.chip, isSelected && styles.chipSelected]}
-    onPress={onPress}
-  >
-    <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
-
-const ExploreScreenHeader = ({
-  subjects,
-  selectedSubjectId,
-  toggleSubjectFilter,
-  clearFilters,
-  suggestedTeachers,
-  selectedTeacherIds,
-  toggleTeacherFilter,
-}: {
-  subjects: any[];
-  selectedSubjectId: string | null;
-  toggleSubjectFilter: (id: string) => void;
-  clearFilters: () => void;
-  suggestedTeachers: any[];
-  selectedTeacherIds: string[];
-  toggleTeacherFilter: (id: string) => void;
-}) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const { t } = useTranslation();
-  const router = useRouter();
-  const selectedSubject = subjects.find((s) => s.id === selectedSubjectId);
-
-  const teacherNames = suggestedTeachers
-    .filter((t) => selectedTeacherIds.includes(t.id))
-    .map((t) => t.name)
-    .join(", ");
-
-  const changeLang = async () => {
-    const newLang = i18next.language.startsWith("ar") ? "en" : "ar";
-    await i18next.changeLanguage(newLang);
-    const isRTL = newLang.startsWith("ar");
-    if (isRTL !== I18nManager.isRTL) {
-      I18nManager.forceRTL(isRTL);
-      await Updates.reloadAsync();
-    }
-  };
-
-  return (
-    <>
-      <ActivationModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-      />
-      {/* Language Switcher Button (Temporary) */}
-      <TouchableOpacity onPress={changeLang} style={styles.langSwitcher}>
-        <Text style={styles.langSwitcherText}>
-          {i18next.language.startsWith("ar")
-            ? "Switch to English"
-            : "التحويل للعربية"}
-        </Text>
-      </TouchableOpacity>
-      {/* Video Code Input */}
-      {selectedSubjectId || selectedTeacherIds.length > 0 ? (
-        <View style={styles.filterInfoContainer}>
-          <Text style={styles.filterInfoText}>
-            {t("explore.filteringBy", {
-              subject: selectedSubject?.title,
-              teachers: teacherNames ? ` | ${teacherNames}` : "",
-            })}
-          </Text>
-          <TouchableOpacity onPress={clearFilters}>
-            <Text style={styles.clearFilterText}>
-              {t("explore.clearFilters")}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.inputRow}>
-          <TextInput
-            placeholder={t("explore.videoCodePlaceholder")}
-            style={styles.input}
-            textAlign={I18nManager.isRTL ? "right" : "left"}
-          />
-          <TouchableOpacity
-            style={styles.inputButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={styles.inputButtonText}>
-              {t("explore.videoCodeButton")}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Study Subjects */}
-      <SectionHeader title={t("explore.studySubjects")} />
-      <View style={styles.chipContainer}>
-        {subjects.map((subject) => (
-          <Chip
-            key={subject.id}
-            label={subject.title}
-            isSelected={selectedSubjectId === subject.id}
-            onPress={() => toggleSubjectFilter(subject.id)}
-          />
-        ))}
-      </View>
-
-      {/* Suggested Teachers */}
-      <SectionHeader
-        title={t("explore.suggestedTeachers")}
-        onShowAll={() => router.push("/all-teachers")}
-      />
-      <ScrollView
-        style={styles.row}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      >
-        {suggestedTeachers.slice(0, 5).map((teacher) => (
-          <Chip
-            key={teacher.id}
-            label={teacher.name}
-            isSelected={selectedTeacherIds.includes(teacher.id)}
-            onPress={() => {
-              if (selectedSubjectId) {
-                toggleTeacherFilter(teacher.id);
-              } else {
-                router.push({
-                  pathname: "/teacher/[id]",
-                  params: { id: teacher.id },
-                });
-              }
-            }}
-          />
-        ))}
-      </ScrollView>
-
-      {/* Free Videos Header */}
-      <SectionHeader title={t("explore.freeVideos")} />
-    </>
-  );
-};
+import { useExploreScreen } from '@/hooks/useExploreScreen';
+import { ExploreHeader } from '@/components/organisms/ExploreHeader';
+import { VideoCard } from '@/components/molecules/VideoCard';
+import { SyncService } from '@/services/SyncService';
+import { useSQLiteContext } from 'expo-sqlite';
+import ActivationModal from '../components/ActivationModal';
 
 export default function ExploreScreen() {
-  const { t } = useTranslation();
+  const router = useRouter();
+  const { colors } = useTheme();
+  const isFocused = useIsFocused();
+  const db = useSQLiteContext();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const {
     subjects,
     suggestedTeachers,
+    totalSubjectTeachersCount,
     freeVideos,
     isLoading,
     selectedSubjectId,
@@ -183,47 +42,130 @@ export default function ExploreScreen() {
     toggleTeacherFilter,
     clearFilters,
     handleLoadMore,
+    refetchData,
   } = useExploreScreen();
 
-  if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (isFocused) {
+      refetchData();
+    }
+  }, [isFocused, refetchData]);
 
-  return (
-    <FlatList
-      style={styles.container}
-      data={freeVideos}
-      renderItem={({ item: video }) => {
-        if (video.type !== "free") return null;
-        return (
-          <View style={styles.videoCardContainer}>
-            <Link
-              href={{
-                pathname: "/video/[id]",
-                params: { id: video.id },
-              }}
-              asChild
-            >
-              <HorizontalCard
-                item={{
-                  title: video.title,
-                  image: `https://img.youtube.com/vi/${video.youtube_id}/0.jpg`,
-                  members: t("explore.free"),
-                  activity: "",
-                }}
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await SyncService.run(db, true);
+    } catch (e) {
+      console.warn('SyncService refresh error:', e);
+    }
+    await refetchData();
+    setIsRefreshing(false);
+  }, [db, refetchData]);
+
+  const handleNavigateToTeacher = useCallback(
+    (id: string) => {
+      router.push({
+        pathname: '/teacher/[id]',
+        params: { id },
+      });
+    },
+    [router]
+  );
+
+  const handleNavigateToAllTeachers = useCallback(() => {
+    router.push({
+      pathname: '/all-teachers',
+      params: selectedSubjectId ? { subjectId: selectedSubjectId } : undefined,
+    });
+  }, [router, selectedSubjectId]);
+
+  const handleOpenVideo = useCallback(
+    (id: string) => {
+      router.push({
+        pathname: '/video/[id]',
+        params: { id },
+      });
+    },
+    [router]
+  );
+
+  const renderVideoItem = useCallback(
+    ({ item }: { item: any }) => {
+      const videoType = item.video_type || item.type;
+      if (videoType !== 'free') return null;
+
+      const teacherId = item.teacher_id ? item.teacher_id.toString() : null;
+
+      return (
+        <View style={styles.cardCol}>
+          <VideoCard
+            id={item.id.toString()}
+            title={item.title}
+            youtubeId={item.youtube_id}
+            thumbnailUrl={item.thumbnail || item.image}
+            videoType={videoType}
+            teacherId={teacherId}
+            teacherName={item.teacher_name}
+            teacherImage={item.teacher_image || item.teacher_profile_picture_url}
+            subjectName={item.subject_name || item.teacher_subject}
+            durationSeconds={item.duration_seconds}
+            onPressVideo={() => handleOpenVideo(item.id.toString())}
+            onPressTeacher={
+              teacherId ? () => handleNavigateToTeacher(teacherId) : undefined
+            }
+          />
+        </View>
+      );
+    },
+    [handleOpenVideo, handleNavigateToTeacher]
+  );
+
+  const listHeader = useMemo(
+    () => (
+      <>
+        {/* Top App Bar Header: Right = Brand & Logo, Left = QR Scanner */}
+        <View style={[styles.topAppBar, { borderBottomColor: colors.border, backgroundColor: colors.card }]}>
+          {/* Brand Info & Logo (Right in RTL) */}
+          <View style={styles.brandRow}>
+            <View style={[styles.logoPill, { borderColor: colors.border, backgroundColor: colors.card }]}>
+              <Image
+                source={require('@/assets/images/icon.png')}
+                style={styles.logoImage}
+                resizeMode="cover"
               />
-            </Link>
+            </View>
+            <View style={styles.headerTitleWrap}>
+              <View style={styles.titleWithBadge}>
+                <Text style={[styles.mainBrandTitle, { color: colors.text }]}>
+                  منصة بامبو
+                </Text>
+                <View style={[styles.proBadge, { backgroundColor: `${colors.primary}15` }]}>
+                  <Text style={[styles.proBadgeText, { color: colors.primary }]}>التعليمية</Text>
+                </View>
+              </View>
+              <Text style={styles.headerSubtitle}>
+                دليل المواد والدروس المجانية ونخبة المعلمين
+              </Text>
+            </View>
           </View>
-        );
-      }}
-      keyExtractor={(video) => video.id.toString()}
-      numColumns={2}
-      ListHeaderComponent={
-        <ExploreScreenHeader
+
+          {/* Quick Scanner Action Button (Left in RTL) */}
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => setModalVisible(true)}
+            style={[
+              styles.scannerBtn,
+              { backgroundColor: `${colors.primary}12`, borderColor: `${colors.primary}35` },
+            ]}
+          >
+            <Text style={[styles.scannerBtnText, { color: colors.primary }]}>
+              تفعيل كود
+            </Text>
+            <Ionicons name="qr-code-outline" size={17} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+
+        <ExploreHeader
           subjects={subjects}
           selectedSubjectId={selectedSubjectId}
           toggleSubjectFilter={toggleSubjectFilter}
@@ -231,150 +173,196 @@ export default function ExploreScreen() {
           suggestedTeachers={suggestedTeachers}
           selectedTeacherIds={selectedTeacherIds}
           toggleTeacherFilter={toggleTeacherFilter}
+          totalSubjectTeachersCount={totalSubjectTeachersCount}
+          freeVideosCount={freeVideos.length}
+          onOpenActivationModal={() => setModalVisible(true)}
+          onNavigateToTeacher={handleNavigateToTeacher}
+          onNavigateToAllTeachers={handleNavigateToAllTeachers}
         />
-      }
-      contentContainerStyle={styles.listContentContainer}
-      onEndReached={handleLoadMore}
-      onEndReachedThreshold={0.5}
-      ListFooterComponent={
-        isFetchingMore ? (
-          <ActivityIndicator size="large" style={{ marginVertical: 20 }} />
-        ) : null
-      }
-    />
+      </>
+    ),
+    [
+      colors,
+      subjects,
+      selectedSubjectId,
+      toggleSubjectFilter,
+      clearFilters,
+      suggestedTeachers,
+      selectedTeacherIds,
+      toggleTeacherFilter,
+      totalSubjectTeachersCount,
+      freeVideos.length,
+      handleNavigateToTeacher,
+      handleNavigateToAllTeachers,
+    ]
   );
-}
 
-function SectionHeader({
-  title,
-  onShowAll,
-}: {
-  title: string;
-  onShowAll?: () => void;
-}) {
-  const { t } = useTranslation();
+  const listEmptyComponent = useMemo(() => {
+    if (isLoading) return null;
+    return (
+      <View style={styles.emptyContainer}>
+        <Ionicons name="search-outline" size={40} color="#8E8E93" style={{ marginBottom: 8 }} />
+        <Text style={[styles.emptyText, { color: colors.text }]}>
+          لا توجد دروس مطابقة للفلتر المحدد حالياً.
+        </Text>
+      </View>
+    );
+  }, [isLoading, colors.text]);
+
+  if (isLoading && subjects.length === 0) {
+    return (
+      <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {onShowAll && (
-        <TouchableOpacity onPress={onShowAll}>
-          <Text style={styles.showAll}>{t("explore.showAll")}</Text>
-        </TouchableOpacity>
-      )}
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <FlatList
+        data={freeVideos}
+        renderItem={renderVideoItem}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        ListHeaderComponent={listHeader}
+        ListEmptyComponent={listEmptyComponent}
+        contentContainerStyle={styles.listContent}
+        columnWrapperStyle={styles.columnWrapper}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+        ListFooterComponent={
+          isFetchingMore ? (
+            <ActivityIndicator
+              size="small"
+              color={colors.primary}
+              style={styles.footerLoader}
+            />
+          ) : null
+        }
+      />
+
+      <ActivationModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f9f9f9" },
-  langSwitcher: {
-    backgroundColor: "#e0e7ff",
-    padding: 10,
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginTop: 16,
-    alignItems: "center",
-  },
-  langSwitcherText: {
-    fontWeight: "bold",
-    color: "#4338ca",
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    margin: 16,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 8,
-    elevation: 1,
-  },
-  input: {
+  container: {
     flex: 1,
+  },
+  topAppBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  logoPill: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+  },
+  logoImage: {
+    width: '100%',
+    height: '100%',
+  },
+  headerTitleWrap: {
+    alignItems: 'flex-start',
+    flex: 1,
+  },
+  titleWithBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  mainBrandTitle: {
     fontSize: 16,
-    padding: 8,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    marginLeft: I18nManager.isRTL ? 0 : 8,
-    marginRight: I18nManager.isRTL ? 8 : 0,
+    fontWeight: '800',
   },
-  inputButton: {
-    backgroundColor: "#4a90e2",
-    borderRadius: 8,
-    padding: 10,
+  proBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 6,
   },
-  inputButtonText: { color: "#fff", fontSize: 18 },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginHorizontal: 16,
-    marginTop: 24,
-    marginBottom: 8,
+  proBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
   },
-  sectionTitle: { fontSize: 16, fontWeight: "bold" },
-  showAll: {
-    color: "#4a90e2",
-    fontWeight: "bold",
-    transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
+  headerSubtitle: {
+    fontSize: 10.5,
+    color: '#8E8E93',
+    marginTop: 2,
   },
-  row: {
-    marginHorizontal: 16,
-    marginBottom: 8,
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+  scannerBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 6,
   },
-  chipContainer: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    flexWrap: "wrap",
-    marginHorizontal: 16,
-    marginBottom: 8,
+  scannerBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    writingDirection: 'rtl',
   },
-  chip: {
-    backgroundColor: "#e0e0e0",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginLeft: I18nManager.isRTL ? 8 : 0,
-    marginRight: I18nManager.isRTL ? 0 : 8,
-    marginBottom: 8,
-  },
-  chipSelected: {
-    backgroundColor: "#4a90e2",
-  },
-  chipText: { fontSize: 14 },
-  chipTextSelected: {
-    color: "#fff",
-  },
-  filterInfoContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#eef5ff",
-    padding: 12,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  filterInfoText: {
+  centerContainer: {
     flex: 1,
-    fontSize: 14,
-    color: "#333",
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  clearFilterText: {
-    fontSize: 14,
-    color: "#ff4d4f",
-    fontWeight: "bold",
+  listContent: {
+    paddingBottom: 36,
   },
-  videosGrid: {
+  columnWrapper: {
     paddingHorizontal: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  listContentContainer: {
-    paddingHorizontal: 16,
+  cardCol: {
+    width: '48.5%',
   },
-  videoCardContainer: {
-    width: "48%", // Two columns with a little space
-    marginBottom: 16,
-    marginRight: I18nManager.isRTL ? 0 : "4%",
-    marginLeft: I18nManager.isRTL ? "4%" : 0,
+  footerLoader: {
+    marginVertical: 16,
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: 13,
+    fontWeight: '600',
+    opacity: 0.7,
+    textAlign: 'center',
   },
 });

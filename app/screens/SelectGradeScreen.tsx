@@ -1,27 +1,25 @@
-import { databaseService } from "@/lib/DatabaseService";
-import { useAppStore } from "@/lib/store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedView } from "@/components/ui/ThemedView";
+import { getGrades } from "@/lib/db/queries/grade.queries";
+import { saveSetting } from "@/lib/db/queries/settings.queries";
+import { useAppActions } from "@/lib/store";
+import { useTheme } from "@react-navigation/native";
 import { router } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function SelectGradeScreen() {
   const db = useSQLiteContext();
-  const { setSelectedGradeId } = useAppStore((state) => state.actions);
+  const { setSelectedGradeId } = useAppActions();
   const [grades, setGrades] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { colors } = useTheme();
 
   useEffect(() => {
     async function fetchGrades() {
       try {
-        const result = await databaseService.getGrades(db);
+        const result = await getGrades(db);
         setGrades(result);
       } catch (error) {
         console.error("Failed to fetch grades:", error);
@@ -34,7 +32,7 @@ export default function SelectGradeScreen() {
 
   const handleSelectGrade = async (gradeId: string) => {
     try {
-      await AsyncStorage.setItem("selectedGradeId", gradeId);
+      await saveSetting(db, "selected_grade_id", gradeId);
       setSelectedGradeId(gradeId);
       router.replace("/(tabs)"); // Navigate to the main app
     } catch (error) {
@@ -44,25 +42,25 @@ export default function SelectGradeScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <ThemedView style={styles.container}>
         <ActivityIndicator size="large" />
-      </View>
+      </ThemedView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Select Your Grade</Text>
+    <ThemedView style={styles.container}>
+      <ThemedText style={styles.title}>Select Your Grade</ThemedText>
       {grades.map((grade) => (
         <TouchableOpacity
           key={grade.id}
-          style={styles.gradeButton}
+          style={[styles.gradeButton, { backgroundColor: colors.card }]}
           onPress={() => handleSelectGrade(grade.id)}
         >
-          <Text style={styles.gradeButtonText}>{grade.title}</Text>
+          <ThemedText style={styles.gradeButtonText}>{grade.title}</ThemedText>
         </TouchableOpacity>
       ))}
-    </View>
+    </ThemedView>
   );
 }
 
@@ -71,7 +69,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
   },
   title: {
     fontSize: 24,
@@ -79,7 +76,6 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   gradeButton: {
-    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,

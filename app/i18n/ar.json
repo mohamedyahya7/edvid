@@ -9,5 +9,23 @@
     "filteringBy": "فلترة بـ: {{subject}}{{teachers}}",
     "clearFilters": "إزالة الفلاتر",
     "free": "مجاني"
+  },
+  "select_your_grade": "اختر صفك الدراسي",
+  "welcome": "أهلاً بك",
+  "time": {
+    "watched": "شوهد",
+    "ago": "منذ",
+    "year": "سنة",
+    "year_plural": "سنوات",
+    "month": "شهر",
+    "month_plural": "أشهر",
+    "day": "يوم",
+    "day_plural": "أيام",
+    "hour": "ساعة",
+    "hour_plural": "ساعات",
+    "minute": "دقيقة",
+    "minute_plural": "دقائق",
+    "second": "ثانية",
+    "second_plural": "ثواني"
   }
 }

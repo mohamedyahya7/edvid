@@ -32,16 +32,45 @@ Here is the current status and the next steps for building the offline-first vid
 
 ### Phase 3: Advanced Features & Offline Capabilities (To Do)
 
-- [ ] Investigate and fix bad behavior when changing language.
-- [ ] **UI Development:**
-  - [ ] Implement the `CourseDetailScreen` to display course information and its video list.
-  - [ ] Implement the `fetchVideosForCourse` action in the Zustand store and connect it to `CourseDetailScreen`.
-  - [ ] Build the `LibraryScreen` to show favorite or downloaded videos.
-- [ ] **Content Handling:**
-  - [ ] **Dependencies:** Install `expo-file-system`, `expo-video`, `react-native-youtube-iframe`.
-  - [ ] **Video Player:** Implement the conditional video player in a `VideoDetailScreen`.
-    - [ ] Show `react-native-youtube-iframe` for free, online videos.
-    - [ ] Show `expo-video` player for downloaded, offline videos.
+- [ ] **Database Foundation:**
+
+  - [x] Add `app_settings` table to manage general application state.
+  - [x] Refactor startup logic to save/load `selected_grade_id` from the new table.
+  - [x] Add `is_followed` column to `teachers` table.
+  - [x] Create `pending_actions` table for sync queue.
+  - [x] Add `is_favorite` column to `videos` table.
+  - [x] Add `access_type` column to `videos` table.
+  - [x] Add `watch_count` column to `videos` table.
+  - [x] Add `download_expiry_date` column to `videos` table.
+  - [x] Add `download_status` column to `videos` table.
+
+- [ ] **UI Development & Local Logic:**
+
+  - [ ] Implement the `TeacherScreen` to display course info and videos.
+  - [ ] Add "Follow/Unfollow" button to `TeacherScreen` and connect it to a new `toggleFollowTeacher` action.
+    - This action should update `teachers.is_followed` locally.
+    - It should also add a `FOLLOW_TEACHER` or `UNFOLLOW_TEACHER` job to the `pending_actions` queue.
+  - [ ] Add "Like/Unlike" button on the `VideoScreen` and connect it to a new `toggleVideoLike` action.
+    - This action should update `videos.is_favorite` locally.
+    - It should also add a `LIKE_VIDEO` or `UNLIKE_VIDEO` job to the `pending_actions` queue.
+  - [ ] **UI/UX Enhancements:**
+    - [ ] Redesign and improve the main UI screens 
+    -(Home (notification,profile/settings),Explore, Library) for a better user experience.
+    - [ ] Design and implement a custom, engaging splash screen.
+
+- [ ] **Synchronization Service:**
+
+  - [ ] Create a `SyncService` responsible for handling data synchronization.
+  - [ ] Implement **Push Logic**:
+    - Create a function to read actions from `pending_actions`.
+    - For each action, make the corresponding API call (e.g., `POST /api/v1/teachers/follow`).
+    - On success, remove the action from the queue. On failure, increment the attempt count.
+  - [ ] Implement **Pull Logic**:
+    - Create a function to fetch changes from the server since `last_synced_at`.
+    - The function should take the server response and perform smart updates/inserts on the local database tables (`grades`, `subjects`, `teachers`, `courses`, `videos`).
+    - After a successful pull, update the `last_synced_at` value in `app_settings`.
+  - [ ] Trigger sync automatically on app start and periodically in the background.
+
 - [ ] **Backend & API Integration:**
   - [ ] **Note:** The backend API and database schema must support multilingual content (e.g., `title_en`, `title_ar`).
   - [ ] **Backend (Laravel):** Implement the API endpoints as defined in the API Contract.
@@ -54,6 +83,21 @@ Here is the current status and the next steps for building the offline-first vid
 - [ ] **Offline Sync:** Plan and implement a strategy for syncing local data with a server.
 - [ ] **Video Player:** Implement a player to handle local video and audio files.
 - [ ] **Build & Deploy:** Create a development build to test notifications and background tasks.
+- [ ] **Note:** The backend API and database schema must support all new actions and data points.
+- [ ] **Backend (Laravel):** Implement all required API endpoints:
+
+  - `POST /api/v1/sync` (for the pull logic)
+  - `POST /api/v1/teachers/follow`
+  - `POST /api/v1/videos/like`
+
+- [ ] Implement user authentication flow (login/register).
+- [ ] On successful login, retrieve and store user data from the server, including an auth token, name, and `grade_id`.
+- [ ] Refactor the initial app logic in `app/_layout.tsx` to check for the user's auth token instead of a locally saved `grade_id`.
+  - If a token exists, the user is logged in. Use the `grade_id` from their profile to set the app state.
+  - If no token exists, redirect the user to a new Login screen.
+- [ ] Create a dedicated Login/Register screen.
+- [ ] Secure API requests using the stored auth token.
+- [ ] Add a "Logout" functionality.
 
 ---
 

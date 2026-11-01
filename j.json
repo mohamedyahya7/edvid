@@ -1,0 +1,397 @@
+{
+    "courses": [
+        {
+            "grade_id": 4,
+            "id": 1,
+            "teacher_id": 1,
+            "updated_at": "2025-08-08T15:04:35.000000Z"
+        },
+        {
+            "grade_id": 4,
+            "id": 2,
+            "teacher_id": 1,
+            "updated_at": "2025-08-08T15:04:35.000000Z"
+        },
+        {
+            "grade_id": 4,
+            "id": 3,
+            "teacher_id": 2,
+            "updated_at": "2025-08-08T15:04:35.000000Z"
+        },
+        {
+            "grade_id": 4,
+            "id": 4,
+            "teacher_id": 2,
+            "updated_at": "2025-08-08T15:04:35.000000Z"
+        },
+        {
+            "grade_id": 4,
+            "id": 5,
+            "teacher_id": 3,
+            "updated_at": "2025-08-08T15:04:35.000000Z"
+        },
+        {
+            "grade_id": 4,
+            "id": 6,
+            "teacher_id": 3,
+            "updated_at": "2025-08-08T15:04:35.000000Z"
+        },
+        {
+            "grade_id": 4,
+            "id": 12,
+            "teacher_id": 6,
+            "updated_at": "2025-08-09T00:51:30.000000Z"
+        }
+    ],
+    "subjects": [
+        {
+            "id": 2,
+            "image": null,
+            "name": "التاريخ"
+        },
+        {
+            "id": 3,
+            "image": null,
+            "name": "الجغرافيا"
+        }
+    ],
+    "teachers": [
+        {
+            "bio": "Aliquam sapiente voluptas dolorem molestiae fugit sed eius. Quo voluptatem explicabo cupiditate consequatur. Deserunt omnis eligendi libero nulla. Ex maxime voluptates dolore est.",
+            "followers_count": 0,
+            "id": 1,
+            "image": "https://via.placeholder.com/640x480.png/00cc44?text=non",
+            "subject_id": 2,
+            "updated_at": "2025-08-08T15:04:35.000000Z",
+            "user": [Object
+            ],
+            "user_id": 2,
+            "views": "309"
+        },
+        {
+            "bio": "Voluptas amet totam quaerat facere non animi ut. Veniam natus in veniam adipisci esse voluptatem magni. Nostrum quos asperiores ut dicta.",
+            "followers_count": 0,
+            "id": 2,
+            "image": "https://via.placeholder.com/640x480.png/008822?text=consequuntur",
+            "subject_id": 3,
+            "updated_at": "2025-08-08T15:04:35.000000Z",
+            "user": [Object],
+            "user_id": 3,
+            "views": "200"
+        },
+        {
+            "bio": "Ex iusto autem dolorem facere doloribus. Quis in voluptatem officiis blanditiis. Et ut sit voluptatem autem.",
+            "followers_count": 0,
+            "id": 3,
+            "image": "https://via.placeholder.com/640x480.png/00aaaa?text=et",
+            "subject_id": 2,
+            "updated_at": "2025-08-08T15:04:35.000000Z",
+            "user": [Object
+            ],
+            "user_id": 4,
+            "views": "175"
+        },
+        {
+            "bio": "rtrytcvjnklm;",
+            "followers_count": 0,
+            "id": 6,
+            "image": "01K264X4ZVHXS4A7T22QB7AAJD.jpg",
+            "subject_id": 3,
+            "updated_at": "2025-08-09T00:50:16.000000Z",
+            "user": [Object
+            ],
+            "user_id": 67,
+            "views": null
+        }
+    ],
+    "videos": [
+        {
+            "course_id": 1,
+            "created_at": "2025-08-08T15:04:35.000000Z",
+            "description": "Eligendi itaque laborum vero omnis nobis. Vel est ipsam doloremque voluptate facere. Blanditiis sed maxime commodi voluptatem. Facilis et ducimus tenetur eos sapiente et.",
+            "generated_codes_count": 34,
+            "id": 1,
+            "thumbnail_path": "https://picsum.photos/seed/349336221/480/270",
+            "title": "Quaerat rerum fuga veniam.",
+            "type": "free",
+            "updated_at": "2025-08-09T02:49:03.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 1,
+            "created_at": "2025-08-08T15:04:36.000000Z",
+            "description": "Dolor accusamus unde molestias laboriosam veritatis aperiam recusandae. Qui quod quae totam doloribus.",
+            "generated_codes_count": 25,
+            "id": 2,
+            "thumbnail_path": "https://picsum.photos/seed/1295823191/480/270",
+            "title": "Deserunt cum laboriosam harum.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:36.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 1,
+            "created_at": "2025-08-08T15:04:36.000000Z",
+            "description": "Eos excepturi non deserunt beatae veniam quia provident amet. Non iste rerum quidem sed.",
+            "generated_codes_count": 50,
+            "id": 3,
+            "thumbnail_path": "https://picsum.photos/seed/1937505437/480/270",
+            "title": "Sed corporis quia.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:36.000000Z",
+            "youtube_url": null
+        },
+        {
+            "course_id": 1,
+            "created_at": "2025-08-08T15:04:36.000000Z",
+            "description": "Corrupti id earum neque expedita quibusdam omnis facere. Qui porro inventore sed vel quam explicabo et est. Dicta molestiae labore omnis fuga.",
+            "generated_codes_count": 25,
+            "id": 4,
+            "thumbnail_path": "https://picsum.photos/seed/1026678540/480/270",
+            "title": "Ut hic ex consequatur placeat et.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:36.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 1,
+            "created_at": "2025-08-08T15:04:36.000000Z",
+            "description": "Aut sapiente sed ut ratione consequuntur non. Atque aut commodi quo autem. Aut nostrum ut sapiente.",
+            "generated_codes_count": 55,
+            "id": 5,
+            "thumbnail_path": "https://picsum.photos/seed/1830246980/480/270",
+            "title": "Dolor natus sunt eius.",
+            "type": "free",
+            "updated_at": "2025-08-12T04:34:49.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 2,
+            "created_at": "2025-08-08T15:04:37.000000Z",
+            "description": "Aut alias officiis quisquam veritatis optio fugit eos. Numquam vero rerum ea distinctio enim provident. Aut et magnam fugit veritatis maiores vero consequatur. Nulla qui aspernatur animi error voluptatibus corrupti.",
+            "generated_codes_count": 25,
+            "id": 6,
+            "thumbnail_path": "https://picsum.photos/seed/1521246125/480/270",
+            "title": "Adipisci deleniti vel voluptas.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:37.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 2,
+            "created_at": "2025-08-08T15:04:37.000000Z",
+            "description": "Provident qui id pariatur libero. Delectus eum fugit neque dolorem corrupti in blanditiis qui. Dolores nesciunt qui a qui dolorem excepturi enim.",
+            "generated_codes_count": 45,
+            "id": 7,
+            "thumbnail_path": "https://picsum.photos/seed/756206183/480/270",
+            "title": "Nulla iste doloribus non quis.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:37.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 2,
+            "created_at": "2025-08-08T15:04:37.000000Z",
+            "description": "Minima occaecati perspiciatis sint quaerat repudiandae est. Quaerat quis aut sit dolor dolores. Et cum et exercitationem iure rerum quasi eaque. Quasi voluptates ipsa sunt est aut.",
+            "generated_codes_count": 25,
+            "id": 8,
+            "thumbnail_path": "https://picsum.photos/seed/511955589/480/270",
+            "title": "Velit distinctio deleniti.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:37.000000Z",
+            "youtube_url": null
+        },
+        {
+            "course_id": 2,
+            "created_at": "2025-08-08T15:04:37.000000Z",
+            "description": "Sunt molestiae facere officiis similique. Rem ut sit porro sapiente. At expedita fugit corrupti ut fugiat.",
+            "generated_codes_count": 25,
+            "id": 9,
+            "thumbnail_path": "https://picsum.photos/seed/1730399513/480/270",
+            "title": "Voluptatibus odio voluptate voluptas laborum.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:37.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 3,
+            "created_at": "2025-08-08T15:04:37.000000Z",
+            "description": "Repellat assumenda omnis qui aut nam. Tempora tempore tempore corporis aspernatur non vel facere. Et reprehenderit maxime illo et quas.",
+            "generated_codes_count": 25,
+            "id": 10,
+            "thumbnail_path": "https://picsum.photos/seed/808186097/480/270",
+            "title": "Veritatis voluptatem tenetur iste.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:37.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 3,
+            "created_at": "2025-08-08T15:04:38.000000Z",
+            "description": "Asperiores dicta facilis explicabo vel possimus dolorem aut. Et dolorem sint quia. Modi similique saepe voluptate mollitia libero nesciunt porro.",
+            "generated_codes_count": 25,
+            "id": 11,
+            "thumbnail_path": "https://picsum.photos/seed/2141370272/480/270",
+            "title": "Est assumenda nam voluptatum nobis.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:38.000000Z",
+            "youtube_url": null
+        },
+        {
+            "course_id": 3,
+            "created_at": "2025-08-08T15:04:38.000000Z",
+            "description": "Ratione rerum saepe iure quis. Sint eius dolorum facere occaecati itaque expedita rerum non. Est explicabo in quasi. Commodi totam nemo necessitatibus dolorum in.",
+            "generated_codes_count": 25,
+            "id": 12,
+            "thumbnail_path": "https://picsum.photos/seed/857443832/480/270",
+            "title": "Nesciunt tenetur commodi ipsum quo.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:38.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 3,
+            "created_at": "2025-08-08T15:04:38.000000Z",
+            "description": "Ut perspiciatis aut tempore inventore est. Et vero omnis provident in quia. Omnis aspernatur similique nam repudiandae.",
+            "generated_codes_count": 25,
+            "id": 13,
+            "thumbnail_path": "https://picsum.photos/seed/1966115139/480/270",
+            "title": "Sapiente magnam placeat.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:38.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 4,
+            "created_at": "2025-08-08T15:04:38.000000Z",
+            "description": "Aut omnis harum dignissimos quia eligendi eum velit. Sapiente alias aut necessitatibus cupiditate accusamus ut dolorum. Pariatur voluptas non itaque maiores saepe.",
+            "generated_codes_count": 25,
+            "id": 14,
+            "thumbnail_path": "https://picsum.photos/seed/1560697626/480/270",
+            "title": "Iure atque sint itaque atque sed.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:38.000000Z",
+            "youtube_url": null
+        },
+        {
+            "course_id": 4,
+            "created_at": "2025-08-08T15:04:39.000000Z",
+            "description": "Enim veniam atque voluptatem sed. Nam itaque modi eligendi adipisci laudantium. Placeat accusantium quas praesentium unde eius.",
+            "generated_codes_count": 25,
+            "id": 15,
+            "thumbnail_path": "https://picsum.photos/seed/1555682796/480/270",
+            "title": "Aut dolores et nihil.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:39.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 4,
+            "created_at": "2025-08-08T15:04:39.000000Z",
+            "description": "Doloremque dolor fugit nihil et sequi qui ut suscipit. Repellendus ipsam voluptatem veritatis recusandae voluptatum. Ex qui officia et sequi tempora. Unde quibusdam odit velit harum.",
+            "generated_codes_count": 25,
+            "id": 16,
+            "thumbnail_path": "https://picsum.photos/seed/596005316/480/270",
+            "title": "Dolorem sit illum voluptates optio iusto.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:39.000000Z",
+            "youtube_url": null
+        },
+        {
+            "course_id": 4,
+            "created_at": "2025-08-08T15:04:39.000000Z",
+            "description": "Et minus autem voluptatum qui maiores quis. Sit sed sint eaque nam quisquam. Laboriosam nostrum veritatis sed officiis in veniam. Consequatur autem molestias mollitia est voluptas.",
+            "generated_codes_count": 25,
+            "id": 17,
+            "thumbnail_path": "https://picsum.photos/seed/822779786/480/270",
+            "title": "Consequatur excepturi necessitatibus illum autem saepe.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:39.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 5,
+            "created_at": "2025-08-08T15:04:39.000000Z",
+            "description": "Et ea eaque aspernatur quo. Quam et nemo natus vel. Non occaecati illo ea ratione harum sunt corrupti.",
+            "generated_codes_count": 25,
+            "id": 18,
+            "thumbnail_path": "https://picsum.photos/seed/1549006974/480/270",
+            "title": "Amet praesentium ut aut.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:39.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 5,
+            "created_at": "2025-08-08T15:04:39.000000Z",
+            "description": "Quia minima et nobis. Harum repellat et consectetur eveniet. Animi illum consequatur odit molestias. Ipsa quia quo non enim.",
+            "generated_codes_count": 25,
+            "id": 19,
+            "thumbnail_path": "https://picsum.photos/seed/438245062/480/270",
+            "title": "Eum voluptate enim est.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:39.000000Z",
+            "youtube_url": null
+        },
+        {
+            "course_id": 5,
+            "created_at": "2025-08-08T15:04:40.000000Z",
+            "description": "Quaerat recusandae dolor est dolorum provident. Et eos cumque a officiis voluptatem et et. Magni quod qui delectus sint id facere. Qui placeat perferendis quidem.",
+            "generated_codes_count": 25,
+            "id": 20,
+            "thumbnail_path": "https://picsum.photos/seed/550300887/480/270",
+            "title": "Veniam aperiam eveniet nihil in at.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:40.000000Z",
+            "youtube_url": null
+        },
+        {
+            "course_id": 5,
+            "created_at": "2025-08-08T15:04:40.000000Z",
+            "description": "Cupiditate qui esse nemo et ullam. Iste voluptatem nesciunt ut autem consequuntur. Quo ut occaecati et ratione sed. Consequatur quisquam blanditiis veniam eaque.",
+            "generated_codes_count": 25,
+            "id": 21,
+            "thumbnail_path": "https://picsum.photos/seed/385168327/480/270",
+            "title": "Voluptatibus distinctio accusamus dolores omnis.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:40.000000Z",
+            "youtube_url": null
+        },
+        {
+            "course_id": 6,
+            "created_at": "2025-08-08T15:04:40.000000Z",
+            "description": "Alias non labore officia distinctio dolore. Veritatis ex sint minus autem est placeat quia. Asperiores consectetur harum quod perferendis.",
+            "generated_codes_count": 25,
+            "id": 22,
+            "thumbnail_path": "https://picsum.photos/seed/318397176/480/270",
+            "title": "Molestiae qui rerum.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:40.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 6,
+            "created_at": "2025-08-08T15:04:40.000000Z",
+            "description": "Consequuntur voluptates dolorem nam officia est. Debitis perspiciatis est ullam est. Et optio ea molestias accusamus.",
+            "generated_codes_count": 25,
+            "id": 23,
+            "thumbnail_path": "https://picsum.photos/seed/1320767789/480/270",
+            "title": "Qui ea ex temporibus.",
+            "type": "free",
+            "updated_at": "2025-08-08T15:04:40.000000Z",
+            "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "course_id": 6,
+            "created_at": "2025-08-08T15:04:41.000000Z",
+            "description": "Qui veritatis et nihil. Ad cum maxime amet libero accusantium. Repellendus aperiam distinctio blanditiis fugit.",
+            "generated_codes_count": 25,
+            "id": 24,
+            "thumbnail_path": "https://picsum.photos/seed/1402898318/480/270",
+            "title": "Ea dolores consequatur odit aut.",
+            "type": "paid",
+            "updated_at": "2025-08-08T15:04:41.000000Z",
+            "youtube_url": null
+        }
+    ]
+}

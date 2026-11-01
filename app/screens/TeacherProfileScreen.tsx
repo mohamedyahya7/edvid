@@ -1,236 +1,141 @@
-import { useTeacherProfileScreen } from "@/hooks/useTeacherProfileScreen";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
-  I18nManager,
-  Image,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
-} from "react-native";
-
-type RootStackParamList = {
-  "video/[id]": { id: string };
-};
+} from 'react-native';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
+import { useTeacherProfileScreen } from '@/hooks/useTeacherProfileScreen';
+import { toggleFollowTeacher } from '@/lib/db/queries/teacher.queries';
+import { TeacherHeroHeader } from '@/components/molecules/TeacherHeroHeader';
+import { TeacherBioSection } from '@/components/molecules/TeacherBioSection';
+import { TeacherLessonsSection } from '@/components/organisms/TeacherLessonsSection';
+import { ActionButton } from '@/components/atoms/ActionButton';
 
 export default function TeacherProfileScreen() {
   const router = useRouter();
-  const { teacher, videos, isLoading } = useTeacherProfileScreen();
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+  const db = useSQLiteContext();
+
+  const { teacher, videos, isLoading, setTeacher } = useTeacherProfileScreen();
+
+  useEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
+
+  const handleToggleFollow = useCallback(async () => {
+    if (!teacher) return;
+    const newFollowStatus = !teacher.is_followed;
+    await toggleFollowTeacher(db, teacher.id, newFollowStatus);
+    // Optimistic UI state update
+    setTeacher({ ...teacher, is_followed: newFollowStatus });
+  }, [teacher, db, setTeacher]);
+
+  const handleWhatsApp = useCallback(() => {
+    if (teacher?.phone) {
+      const cleanPhone = teacher.phone.toString().replace(/[^0-9]/g, '');
+      const fullPhone = cleanPhone.startsWith('2') ? cleanPhone : `2${cleanPhone}`;
+      Linking.openURL(`https://wa.me/+${fullPhone}`);
+    }
+  }, [teacher?.phone]);
+
+  const handleOpenVideo = useCallback(
+    (id: string) => {
+      router.push({
+        pathname: '/video/[id]',
+        params: { id },
+      });
+    },
+    [router]
+  );
+
+  const freeLessonsCount = useMemo(
+    () => videos.filter((v) => v.video_type === 'free').length,
+    [videos]
+  );
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
+      <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   if (!teacher) {
     return (
-      <View style={styles.container}>
-        <Text>Teacher not found.</Text>
+      <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+        <Text style={[styles.errorTitle, { color: colors.text }]}>
+          لم يتم العثور على بيانات المعلم.
+        </Text>
+        <ActionButton
+          title="العودة للخلف"
+          onPress={() => router.back()}
+          variant="primary"
+          style={{ marginTop: 16 }}
+        />
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Image
-        source={{
-          uri:
-            teacher.profile_picture_url ||
-            "https://via.placeholder.com/400x250",
-        }}
-        style={styles.headerImage}
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* 1. Hero Cover Header with Top Action Bar */}
+      <TeacherHeroHeader
+        teacherImage={teacher.profile_picture_url}
+        teacherName={teacher.name}
+        subjectName={teacher.subject_name}
+        hasWhatsApp={Boolean(teacher.phone)}
+        onBack={() => router.back()}
+        onWhatsApp={handleWhatsApp}
       />
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => router.back()}
-      >
-        <Ionicons name="close" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.uploadButton}>
-        <Ionicons
-          name={I18nManager.isRTL ? "arrow-undo-outline" : "share-outline"}
-          size={24}
-          color="white"
-        />
-      </TouchableOpacity>
 
-      <View style={styles.headerContent}>
-        <Text style={styles.teacherName}>{teacher.name}</Text>
-        <Text style={styles.courseTitle}>{teacher.bio}</Text>
-      </View>
+      {/* 2. Floating Teacher Bio Card with Follow Action & Metrics */}
+      <TeacherBioSection
+        bio={teacher.bio}
+        isFollowed={Boolean(teacher.is_followed)}
+        totalLessonsCount={videos.length}
+        freeLessonsCount={freeLessonsCount}
+        hasWhatsApp={Boolean(teacher.phone)}
+        onToggleFollow={handleToggleFollow}
+        onWhatsApp={handleWhatsApp}
+      />
 
-      <TouchableOpacity style={styles.startClassButton}>
-        <Text style={styles.startClassButtonText}>START CLASS</Text>
-      </TouchableOpacity>
-
-      <View style={styles.actionsRow}>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="play" size={20} color="white" />
-          <Text style={styles.actionText}>TRAILER</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="add" size={20} color="white" />
-          <Text style={styles.actionText}>MY LIST</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.tabBar}>
-        <Text style={[styles.tab, styles.activeTab]}>LESSONS</Text>
-        <Text style={styles.tab}>CLASS RESOURCES</Text>
-        <Text style={styles.tab}>OVERVIEW</Text>
-      </View>
-
-      <View style={styles.lessonsContainer}>
-        {videos.map((video, index) => (
-          <TouchableOpacity
-            key={video.id}
-            style={styles.lessonRow}
-            onPress={() =>
-              router.push({
-                pathname: "/video/[id]",
-                params: { id: video.id },
-              })
-            }
-          >
-            <Text style={styles.lessonNumber}>{index + 1}</Text>
-            <View>
-              <Text style={styles.lessonTitle}>{video.title}</Text>
-              <Text style={styles.lessonDuration}>
-                {video.duration_seconds
-                  ? `${Math.floor(video.duration_seconds / 60)}m`
-                  : "N/A"}
-              </Text>
-            </View>
-            <Ionicons
-              name={video.type === "free" ? "play-circle" : "lock-closed"}
-              size={24}
-              color="white"
-            />
-          </TouchableOpacity>
-        ))}
-      </View>
+      {/* 3. Comprehensive Lessons List */}
+      <TeacherLessonsSection
+        videos={videos}
+        onOpenVideo={handleOpenVideo}
+      />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#000",
-  },
   container: {
     flex: 1,
-    backgroundColor: "#000",
   },
-  headerImage: {
-    width: "100%",
-    height: 250,
+  scrollContent: {
+    flexGrow: 1,
   },
-  closeButton: {
-    position: "absolute",
-    top: 40,
-    left: I18nManager.isRTL ? undefined : 20,
-    right: I18nManager.isRTL ? 20 : undefined,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    padding: 8,
-    borderRadius: 20,
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
   },
-  uploadButton: {
-    position: "absolute",
-    top: 40,
-    right: I18nManager.isRTL ? undefined : 20,
-    left: I18nManager.isRTL ? 20 : undefined,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    padding: 8,
-    borderRadius: 20,
-  },
-  headerContent: {
-    padding: 20,
-    alignItems: I18nManager.isRTL ? "flex-end" : "flex-start",
-  },
-  teacherName: {
-    color: "#fff",
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  courseTitle: {
-    color: "#fff",
-    fontSize: 18,
-    marginTop: 4,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  startClassButton: {
-    backgroundColor: "#e50914",
-    marginHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  startClassButtonText: {
-    color: "#fff",
+  errorTitle: {
     fontSize: 16,
-    fontWeight: "bold",
-  },
-  actionsRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    justifyContent: "space-around",
-    padding: 20,
-  },
-  actionButton: {
-    alignItems: "center",
-  },
-  actionText: {
-    color: "#fff",
-    marginTop: 5,
-  },
-  tabBar: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    justifyContent: "space-around",
-    borderBottomWidth: 1,
-    borderBottomColor: "#222",
-  },
-  tab: {
-    color: "#888",
-    padding: 15,
-    fontSize: 14,
-  },
-  activeTab: {
-    color: "#fff",
-    borderBottomWidth: 2,
-    borderBottomColor: "#e50914",
-  },
-  lessonsContainer: {
-    padding: 20,
-  },
-  lessonRow: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  lessonNumber: {
-    color: "#888",
-    fontSize: 18,
-    marginRight: I18nManager.isRTL ? 0 : 15,
-    marginLeft: I18nManager.isRTL ? 15 : 0,
-  },
-  lessonTitle: {
-    color: "#fff",
-    fontSize: 16,
-    textAlign: I18nManager.isRTL ? "right" : "left",
-  },
-  lessonDuration: {
-    color: "#888",
-    fontSize: 12,
-    textAlign: I18nManager.isRTL ? "right" : "left",
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });

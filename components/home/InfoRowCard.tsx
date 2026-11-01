@@ -1,46 +1,90 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
-const InfoRowCard = ({ iconName, title, subtitle }: { iconName: keyof typeof Ionicons.glyphMap, title: string, subtitle: string }) => {
+type InfoRowCardProps = {
+  iconName: keyof typeof Ionicons.glyphMap;
+  title: string;
+  subtitle: string;
+  onPress?: () => void;
+};
+
+export const InfoRowCard = ({
+  iconName,
+  title,
+  subtitle,
+  onPress,
+}: InfoRowCardProps) => {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.card}>
-      <View style={styles.iconContainer}>
-        <Ionicons name={iconName} size={24} color="#888" />
+    <TouchableOpacity
+      activeOpacity={0.78}
+      onPress={onPress}
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+        },
+      ]}
+    >
+      <View style={[styles.iconWrap, { backgroundColor: `${colors.primary}15` }]}>
+        <Ionicons name={iconName} size={22} color={colors.primary} />
       </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+      <View style={styles.textWrap}>
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+          {title}
+        </Text>
+        <Text style={[styles.subtitle, { color: colors.primary }]} numberOfLines={1}>
+          {subtitle}
+        </Text>
       </View>
-    </View>
+      <Ionicons name="chevron-back" size={16} color="#8E8E93" style={styles.chevron} />
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "white",
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  iconContainer: {
-    backgroundColor: "#f0f0f0",
-    borderRadius: 20,
-    padding: 8,
-    marginRight: 15,
-  },
-  textContainer: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 10,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textWrap: {
+    flex: 1,
+    gap: 2,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 13,
+    fontWeight: '700',
+    writingDirection: 'rtl',
   },
   subtitle: {
-    color: "gray",
-    marginTop: 2,
+    fontSize: 11.5,
+    fontWeight: '600',
+    writingDirection: 'rtl',
+  },
+  chevron: {
+    opacity: 0.6,
   },
 });
 

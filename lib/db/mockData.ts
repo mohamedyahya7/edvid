@@ -26,7 +26,6 @@ export const generateMockDataSQL = (): string => {
 
   let sql = `
     DELETE FROM videos;
-    DELETE FROM course_teachers;
     DELETE FROM courses;
     DELETE FROM teachers;
     DELETE FROM subjects;
@@ -49,34 +48,35 @@ export const generateMockDataSQL = (): string => {
 
   grades.forEach((grade) => {
     subjects.forEach((subject) => {
+      // Create one teacher per subject for simplicity in mock data
+      const teacherId = `t${teacherCounter++}`;
+      const gender = teacherCounter % 2 === 0 ? "women" : "men";
+      sql += `INSERT INTO teachers (id, name, bio, profile_picture_url, subject_id, updated_at) VALUES ('${teacherId}', 'مدرس ${teacherCounter}', 'نبذة عن المدرس ${teacherCounter}', 'https://randomuser.me/api/portraits/${gender}/${
+        teacherCounter % 100
+      }.jpg', '${subject.id}', '2023-01-01');\n`;
+
       const courseId = `c${courseCounter++}`;
-      sql += `INSERT INTO courses (id, subject_id, grade_id, title, updated_at) VALUES ('${courseId}', '${subject.id}', '${grade.id}', '${subject.title} - ${grade.title}', '2023-01-01');\n`;
+      // Associate course with the created teacher
+      sql += `INSERT INTO courses (id, teacher_id, grade_id) VALUES ('${courseId}', '${teacherId}', '${grade.id}');\n`;
 
-      for (let i = 0; i < 3; i++) {
-        const teacherId = `t${teacherCounter++}`;
-        const gender = teacherCounter % 2 === 0 ? "women" : "men";
-        sql += `INSERT INTO teachers (id, name, bio, profile_picture_url, updated_at) VALUES ('${teacherId}', 'مدرس ${teacherCounter}', 'نبذة عن المدرس ${teacherCounter}', 'https://randomuser.me/api/portraits/${gender}/${
-          teacherCounter % 100
-        }.jpg', '2023-01-01');\n`;
-        sql += `INSERT INTO course_teachers (course_id, teacher_id) VALUES ('${courseId}', '${teacherId}');\n`;
-
-        for (let j = 0; j < 4; j++) {
-          const videoId = `v${videoCounter++}`;
-          const videoType = j < 2 ? "free" : "paid";
-          const youtubeId =
-            videoType === "free"
-              ? youtubeVideoIds[videoCounter % youtubeVideoIds.length]
-              : null;
-          const videoPath =
-            videoType === "paid" ? `path/to/video_${videoId}.mp4` : null;
-          sql += `INSERT INTO videos (id, title, course_id, teacher_id, video_type, youtube_id, video_path, is_unlocked, updated_at, duration_seconds) VALUES ('${videoId}', 'فيديو ${videoCounter} - ${
-            subject.title
-          }', '${courseId}', '${teacherId}', '${videoType}', ${
-            youtubeId ? `'${youtubeId}'` : "NULL"
-          }, ${videoPath ? `'${videoPath}'` : "NULL"}, ${
-            videoType === "free" ? 1 : 0
-          }, '2023-01-01', ${Math.floor(Math.random() * 1000) + 300});\n`;
-        }
+      for (let j = 0; j < 4; j++) {
+        const videoId = `v${videoCounter++}`;
+        const videoType = j < 2 ? "free" : "paid";
+        const youtubeId =
+          videoType === "free"
+            ? youtubeVideoIds[videoCounter % youtubeVideoIds.length]
+            : null;
+        const thumbnail = `https://picsum.photos/seed/${videoId}/400/225`;
+        sql += `INSERT INTO videos (id, title, course_id, teacher_id, video_type, youtube_id,  is_unlocked, thumbnail, updated_at, duration_seconds) VALUES 
+        ('${videoId}', 'فيديو ${videoCounter} - ${
+          subject.title
+        }', '${courseId}', '${teacherId}', '${videoType}', ${
+          youtubeId ? `'${youtubeId}'` : "NULL"
+        }, ${
+          videoType === "free" ? 1 : 0
+        }, '${thumbnail}', '${new Date().toISOString()}', ${
+          Math.floor(Math.random() * 1000) + 60
+        });\n`;
       }
     });
   });

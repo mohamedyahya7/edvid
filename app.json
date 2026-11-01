@@ -1,22 +1,30 @@
 {
   "expo": {
-    "name": "edvid",
-    "slug": "edvid",
+    "name": "Bamboo",
+    "slug": "Bamboo",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
-    "scheme": "edvid",
+    "scheme": "bamboo",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "supportsRTL": true
     },
     "android": {
+      "supportsRTL": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "package": "com.mo_yahya.Bamboo",
+      "usesCleartextTraffic": true,
+      "allowBackup": false
     },
     "web": {
       "bundler": "metro",
@@ -24,7 +32,20 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-localization",
+        {
+          "supportsRTL": true
+        }
+      ],
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
+        }
+      ],
       "expo-router",
+      "expo-av",
       [
         "expo-splash-screen",
         {
@@ -39,6 +60,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "73adc20a-5718-402a-8955-bb04e91d5c3a"
+      }
     }
   }
 }

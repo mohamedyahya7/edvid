@@ -9,5 +9,23 @@
     "filteringBy": "Filtering by: {{subject}}{{teachers}}",
     "clearFilters": "Clear Filters",
     "free": "Free"
+  },
+  "select_your_grade": "Select your grade",
+  "welcome": "Welcome",
+  "time": {
+    "watched": "Watched",
+    "ago": "ago",
+    "year": "year",
+    "year_plural": "years",
+    "month": "month",
+    "month_plural": "months",
+    "day": "day",
+    "day_plural": "days",
+    "hour": "hour",
+    "hour_plural": "hours",
+    "minute": "minute",
+    "minute_plural": "minutes",
+    "second": "second",
+    "second_plural": "seconds"
   }
 }

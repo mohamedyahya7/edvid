@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import HorsontilCard from "./HorsontilCard";
+import HorizontalCard from "./HorizontalCard";
 
 const ContentSection = ({ title, data }: { title: string; data: any[] }) => {
   return (
@@ -8,7 +8,7 @@ const ContentSection = ({ title, data }: { title: string; data: any[] }) => {
       <Text style={styles.title}>{title}</Text>
       <FlatList
         data={data}
-        renderItem={({ item }) => <HorsontilCard item={item} />}
+        renderItem={({ item }) => <HorizontalCard item={item} />}
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}

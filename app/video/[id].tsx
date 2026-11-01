@@ -4,8 +4,8 @@
 //   return <VideoDetailScreen />;
 // }
 // import { useVideoScreen } from "@/hooks/useVideoScreen";
-import VideoDetailScreen from "../screens/VideoDetailScreen";
 import React from "react";
+import VideoDetailScreen from "../screens/VideoDetailScreen";
 // import React from "react";
 // import {
 //   ActivityIndicator,
@@ -68,7 +68,6 @@ export default function VideoScreen() {
   //   </View>
   //);
 }
-
 // const styles = StyleSheet.create({
 //   container: {
 //     flex: 1,
@@ -105,4 +104,3 @@ export default function VideoScreen() {
 //     color: "#fff",
 //   },
 // });
-

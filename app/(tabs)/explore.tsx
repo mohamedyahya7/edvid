@@ -1,16 +1,10 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import ExploreScreen from '../screens/ExploreScreen';
-
-
-
-// import ListScreen from '../screens/clubs/ListScreen';
-
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import ExploreScreen from "../screens/ExploreScreen";
 
 export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
-      {/* <ListScreen /> */}
       <ExploreScreen />
     </View>
   );
@@ -18,6 +12,5 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 10,
   },
 });

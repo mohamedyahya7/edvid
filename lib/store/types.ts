@@ -1,16 +1,17 @@
-import { DownloadTask } from "@/app/services/DownloadManager";
 import { SQLiteDatabase } from "expo-sqlite";
+import { DownloadTask } from "../../services/DownloadManager";
+import { ReactNode } from "react";
 
 export type Video = {
+  subject_name: ReactNode;
+  teacher_profile_picture_url: any;
   id: string;
   title: string;
+  thumbnail: string;
   course_id: string;
   teacher_id: string;
-  type: "free" | "paid";
+  video_type: "free" | "paid";
   youtube_id?: string;
-  video_path?: string;
-  audio_path?: string;
-  subtitle_path?: string;
   is_unlocked: number;
   downloaded_size_bytes?: number;
   progress_seconds: number;
@@ -19,8 +20,20 @@ export type Video = {
   updated_at: string;
   description?: string; // Added from course
   teacher_name?: string; // Added from join
-  teacher_profile_picture_url?: string; // Added from join
-  cover_image_url?: string; // Added from course
+  teacher_image?: string; // Added from join
+  download_status?:
+    | "COMPLETED"
+    | "DOWNLOADING"
+    | "PAUSED"
+    | "QUEUED"
+    | "FAILED"; // Added for local state
+  local_video_path?: string;
+  local_audio_path?: string;
+  access_type?: "watch" | "download";
+  watch_count?: number;
+  download_expiry_date?: string;
+  activation_code?: string;
+  size?: number;
 };
 
 export interface StoreState {
@@ -28,28 +41,34 @@ export interface StoreState {
   courses: any[];
   subjects: any[];
   suggestedTeachers: any[];
+  totalSubjectTeachersCount: number;
+  allTeachers: any[]; // Add new state for all teachers
   freeVideos: Video[];
-  videos: Video[];
+  libraryVideos: Video[];
   isLoading: boolean;
   selectedSubjectId: string | null;
   selectedTeacherIds: string[];
-  db: any | null;
   explorePage: number;
   hasMoreExploreVideos: boolean;
   downloadTasks: Map<string, DownloadTask>;
+  lastDownloadCompletedTimestamp: number;
+  lastSyncTimestamp: number; // For triggering refetches
 }
 
 export interface StoreActions {
-  setDb: (db: any) => void;
   setSelectedGradeId: (gradeId: string) => void;
   fetchCourses: (db: SQLiteDatabase, gradeId: string) => Promise<void>;
-  fetchExploreData: (db: any) => Promise<void>;
-  fetchVideosForCourse: (db: any, courseId: string) => Promise<void>;
-  toggleSubjectFilter: (subjectId: string) => void;
-  toggleTeacherFilter: (teacherId: string) => void;
-  clearFilters: () => void;
-  fetchMoreExploreVideos: (db: any) => Promise<void>;
+  fetchExploreData: (db: SQLiteDatabase) => Promise<void>;
+  fetchVideosForCourse: (db: SQLiteDatabase, courseId: string) => Promise<void>;
+  toggleSubjectFilter: (db: SQLiteDatabase, subjectId: string) => void;
+  toggleTeacherFilter: (db: SQLiteDatabase, teacherId: string) => void;
+  clearFilters: (db: SQLiteDatabase) => void;
+  fetchAllTeachers: (db: SQLiteDatabase, gradeId: string) => Promise<void>; // Add new action
+  fetchMoreExploreVideos: (db: SQLiteDatabase) => Promise<void>;
   initializeDownloadManagerListener: () => void;
+  notifyDownloadCompleted: () => void;
+  notifySyncCompleted: () => void; // For triggering refetches
+  fetchLibraryVideos: (db: SQLiteDatabase) => Promise<void>;
 }
 
 // Define the types for our state

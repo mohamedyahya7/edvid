@@ -1,25 +1,28 @@
-import { databaseService } from "@/lib/DatabaseService";
+import { getTeacherDetails } from "@/lib/db/queries/teacher.queries";
+import { Video } from "@/lib/store/types";
+import { useAppStore } from "@/lib/store";
+import { useAuthStore } from "@/lib/store/authStore";
 import { useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 
-interface Video {
-  id: string;
-  title: string;
-  type: string;
-  duration_seconds: number;
-}
-
-interface Teacher {
+export interface Teacher {
   id: string;
   name: string;
   bio: string;
   profile_picture_url: string;
+  phone?: any;
+  is_followed?: any;
+  subject_name?: string | null;
 }
 
 export const useTeacherProfileScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const db = useSQLiteContext();
+  const selectedGradeId = useAppStore((state) => state.selectedGradeId);
+  const user = useAuthStore((state) => state.user);
+  const gradeIdToUse = selectedGradeId || user?.grade_id?.toString() || null;
+
   const [teacher, setTeacher] = useState<Teacher | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,10 +32,7 @@ export const useTeacherProfileScreen = () => {
       if (id) {
         try {
           setIsLoading(true);
-          const { teacher, videos } = await databaseService.getTeacherDetails(
-            db,
-            id
-          );
+          const { teacher, videos } = await getTeacherDetails(db, id, gradeIdToUse);
           setTeacher(teacher);
           setVideos(videos);
         } catch (error) {
@@ -43,7 +43,7 @@ export const useTeacherProfileScreen = () => {
       }
     };
     fetchTeacherData();
-  }, [id, db]);
+  }, [id, db, gradeIdToUse]);
 
-  return { teacher, videos, isLoading, id };
+  return { teacher, videos, isLoading, id, setTeacher };
 };
