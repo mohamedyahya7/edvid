@@ -6,7 +6,7 @@ import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "@react-navigation/native";
-import ActiveDownloads from "@/app/components/ActiveDownloads";
+import ActiveDownloads from "@/components/organisms/ActiveDownloads";
 
 export default function TabLayout() {
   const { colors } = useTheme();

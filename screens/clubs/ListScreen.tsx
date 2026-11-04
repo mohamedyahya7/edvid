@@ -7,8 +7,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import ContentSection from "../../../components/clubs/ContentSection";
-import ChipFilter from "../../../components/clubs/ChipFilter";
+import ContentSection from "@/components/clubs/ContentSection";
+import ChipFilter from "@/components/clubs/ChipFilter";
 
 // Mock Data
 const clubsForYou = [

@@ -1,11 +1,11 @@
-// import VideoDetailScreen from "../screens/VideoDetailScreen";
+// import VideoDetailScreen from "@/screens/VideoDetailScreen";
 
 // export default function VideoScreen() {
 //   return <VideoDetailScreen />;
 // }
 // import { useVideoScreen } from "@/hooks/useVideoScreen";
 import React from "react";
-import VideoDetailScreen from "../screens/VideoDetailScreen";
+import VideoDetailScreen from "@/screens/VideoDetailScreen";
 // import React from "react";
 // import {
 //   ActivityIndicator,

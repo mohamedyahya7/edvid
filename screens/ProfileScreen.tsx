@@ -169,7 +169,7 @@ export default function ProfileScreen() {
           <TouchableOpacity
             activeOpacity={0.75}
             style={styles.userInfoWrap}
-            onPress={() => router.push('/screens/EditProfileScreen')}
+            onPress={() => router.push('/edit-profile')}
           >
             <View style={[styles.avatarPill, { backgroundColor: `${colors.primary}18`, borderColor: colors.border }]}>
               <Ionicons name="person" size={20} color={colors.primary} />
@@ -184,7 +184,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             activeOpacity={0.75}
-            onPress={() => router.push('/screens/EditProfileScreen')}
+            onPress={() => router.push('/edit-profile')}
             style={[styles.profileSettingsBtn, { backgroundColor: colors.background, borderColor: colors.border }]}
           >
             <Ionicons name="settings-outline" size={19} color={colors.text} />

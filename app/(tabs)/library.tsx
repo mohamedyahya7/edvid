@@ -1,5 +1,5 @@
 import React from "react";
-import LibraryScreenComponent from "../screens/LibraryScreen";
+import LibraryScreenComponent from "@/screens/LibraryScreen";
 
 export default function LibraryScreen() {
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import ExploreScreen from "../screens/ExploreScreen";
+import ExploreScreen from "@/screens/ExploreScreen";
 
 export default function TabTwoScreen() {
   return (

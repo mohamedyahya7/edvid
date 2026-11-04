@@ -149,11 +149,11 @@ const InitialLayout = () => {
         <Stack.Screen name="teacher/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="video/[id]" options={{ headerShown: false }} />
         <Stack.Screen
-          name="screens/SelectGradeScreen"
+          name="select-grade"
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="screens/EditProfileScreen"
+          name="edit-profile"
           options={{ headerShown: false }}
         />
         <Stack.Screen name="+not-found" />

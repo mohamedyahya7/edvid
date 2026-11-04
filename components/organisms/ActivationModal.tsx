@@ -29,7 +29,7 @@ import {
 } from '@/api/ActivationService';
 import { storageUrl } from '@/api/Axios';
 import { downloadManager } from '@/services/DownloadManager';
-import QRCodeScanner from './QRCodeScanner';
+import QRCodeScanner from '@/components/molecules/QRCodeScanner';
 
 type ActivationModalProps = {
   visible: boolean;

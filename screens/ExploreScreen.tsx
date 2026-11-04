@@ -18,7 +18,7 @@ import { ExploreHeader } from '@/components/organisms/ExploreHeader';
 import { VideoCard } from '@/components/molecules/VideoCard';
 import { SyncService } from '@/services/SyncService';
 import { useSQLiteContext } from 'expo-sqlite';
-import ActivationModal from '../components/ActivationModal';
+import ActivationModal from '@/components/organisms/ActivationModal';
 
 export default function ExploreScreen() {
   const router = useRouter();

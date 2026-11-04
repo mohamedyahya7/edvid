@@ -1,9 +1,9 @@
 import React from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-import FeaturedContentCard from "../../../components/home/FeaturedContentCard";
-import GreetingHeader from "../../../components/home/GreetingHeader";
-import InfoRowCard from "../../../components/home/InfoRowCard";
-import StatCard from "../../../components/home/StatCard";
+import FeaturedContentCard from "@/components/home/FeaturedContentCard";
+import GreetingHeader from "@/components/home/GreetingHeader";
+import InfoRowCard from "@/components/home/InfoRowCard";
+import StatCard from "@/components/home/StatCard";
 
 const DashboardScreen = () => {
   return (

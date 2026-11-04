@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-import ProfileScreen from "../screens/ProfileScreen";
+import ProfileScreen from "@/screens/ProfileScreen";
 
 export default function HomeScreen() {
   return (
