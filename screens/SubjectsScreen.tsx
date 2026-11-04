@@ -5,17 +5,15 @@ import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Text,
-  View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 
 import { useSubjectsScreen } from '@/hooks/useSubjectsScreen';
 import { SubjectItem } from '@/components/molecules/SubjectItem';
 import { SubjectListSkeleton } from '@/components/molecules/SubjectListSkeleton';
 import { SubjectsHeader } from '@/components/organisms/SubjectsHeader';
+import { EmptyStateView } from '@/components/molecules/EmptyStateView';
 
 export default function SubjectsScreen() {
   const router = useRouter();
@@ -68,19 +66,17 @@ export default function SubjectsScreen() {
             />
           }
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <View style={[styles.emptyIconCircle, { backgroundColor: `${colors.primary}15` }]}>
-                <Ionicons name="book-outline" size={32} color={colors.primary} />
-              </View>
-              <Text style={[styles.emptyTitle, { color: colors.text }]}>لا توجد نتائج</Text>
-              <Text style={styles.emptySubtitle}>
-                {searchQuery
+            <EmptyStateView
+              iconName="book-outline"
+              title="لا توجد نتائج"
+              subtitle={
+                searchQuery
                   ? `لم نجد أي مادة مطابقة لبحث "${searchQuery}"`
                   : activeTab === 'followed'
                   ? 'لم تقم بمتابعة أي مادة حتى الآن'
-                  : 'لا توجد مواد مسجلة حالياً'}
-              </Text>
-            </View>
+                  : 'لا توجد مواد مسجلة حالياً'
+              }
+            />
           }
         />
       )}
@@ -96,32 +92,5 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
     paddingBottom: 32,
-  },
-  emptyContainer: {
-    paddingVertical: 60,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  emptyIconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  emptyTitle: {
-    fontSize: 15.5,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    fontSize: 12,
-    color: '#8E8E93',
-    textAlign: 'center',
-    lineHeight: 18,
-    paddingHorizontal: 16,
   },
 });

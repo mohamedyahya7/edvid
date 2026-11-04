@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { FilterChipGroup } from '@/components/molecules/FilterChipGroup';
+import { SearchBar } from '@/components/atoms/SearchBar';
 import { LibraryFilterType, LibrarySubjectOption, LibraryTeacherOption } from '@/types/library';
 
 interface LibraryFilterSectionProps {
@@ -44,22 +45,13 @@ export const LibraryFilterSection: React.FC<LibraryFilterSectionProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Search Bar */}
-      <View style={[styles.searchBar, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        <Ionicons name="search" size={18} color="#8E8E93" />
-        <TextInput
-          style={[styles.searchInput, { color: colors.text }]}
-          placeholder="ابحث في مكتبتك عن درس أو مدرس..."
-          placeholderTextColor="#8E8E93"
+      {/* Reusable Search Bar */}
+      <View style={styles.searchWrap}>
+        <SearchBar
           value={searchQuery}
           onChangeText={onSearchChange}
-          textAlign="right"
+          placeholder="ابحث في مكتبتك عن درس أو مدرس..."
         />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => onSearchChange('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <Ionicons name="close-circle" size={18} color="#8E8E93" />
-          </TouchableOpacity>
-        )}
       </View>
 
       {/* Primary Type Tabs */}
@@ -70,7 +62,7 @@ export const LibraryFilterSection: React.FC<LibraryFilterSectionProps> = ({
           style={[
             styles.tab,
             activeFilter === 'all'
-              ? styles.activeTab
+              ? [styles.activeTab, { backgroundColor: colors.primary }]
               : [styles.inactiveTab, { backgroundColor: colors.card, borderColor: colors.border }],
           ]}
         >
@@ -85,7 +77,7 @@ export const LibraryFilterSection: React.FC<LibraryFilterSectionProps> = ({
           style={[
             styles.tab,
             activeFilter === 'offline'
-              ? styles.activeTab
+              ? [styles.activeTab, { backgroundColor: colors.primary }]
               : [styles.inactiveTab, { backgroundColor: colors.card, borderColor: colors.border }],
           ]}
         >
@@ -105,7 +97,7 @@ export const LibraryFilterSection: React.FC<LibraryFilterSectionProps> = ({
           style={[
             styles.tab,
             activeFilter === 'stream'
-              ? styles.activeTab
+              ? [styles.activeTab, { backgroundColor: colors.primary }]
               : [styles.inactiveTab, { backgroundColor: colors.card, borderColor: colors.border }],
           ]}
         >
@@ -153,27 +145,15 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 6,
   },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  searchWrap: {
     marginHorizontal: 16,
     marginBottom: 12,
-    paddingHorizontal: 12,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: '500',
   },
   tabsRow: {
     flexDirection: 'row',
-    marginHorizontal: 16,
-    marginBottom: 12,
+    paddingHorizontal: 16,
     gap: 8,
+    marginBottom: 12,
   },
   tab: {
     flex: 1,
@@ -181,23 +161,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 9,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 6,
+    borderRadius: 14,
+    gap: 5,
   },
-  activeTab: {
-    backgroundColor: '#00C897',
-    borderColor: '#00C897',
-  },
+  activeTab: {},
   inactiveTab: {
-    backgroundColor: '#F7F9FA',
+    borderWidth: 1,
   },
   tabText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 12.5,
+    fontWeight: '700',
   },
   activeTabText: {
     color: '#FFFFFF',
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

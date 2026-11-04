@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
 import { getUsedCodes } from '@/lib/db/queries/usedCodes.queries';
+import { useSyncRefresh } from '@/hooks/useSyncRefresh';
+import { matchesQuery } from '@/utils/searchMatcher';
 
 export type CodeFilterType = 'all' | 'watch' | 'download';
 
@@ -18,7 +20,6 @@ export function useUsedCodes() {
   const db = useSQLiteContext();
   const [usedCodes, setUsedCodes] = useState<UsedCodeItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<CodeFilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -30,7 +31,6 @@ export function useUsedCodes() {
       console.error('Failed to fetch used codes:', error);
     } finally {
       setLoading(false);
-      setIsRefreshing(false);
     }
   }, [db]);
 
@@ -38,10 +38,10 @@ export function useUsedCodes() {
     fetchCodes();
   }, [fetchCodes]);
 
-  const onRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await fetchCodes();
-  }, [fetchCodes]);
+  // Reusable unified pull-to-refresh
+  const { isRefreshing, onRefresh } = useSyncRefresh(fetchCodes, {
+    debugTag: 'UsedCodes',
+  });
 
   // Compute counts for filter tabs
   const { watchCount, downloadCount } = useMemo(() => {
@@ -65,11 +65,8 @@ export function useUsedCodes() {
     }
 
     if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      list = list.filter(
-        (c) =>
-          (c.id && c.id.toLowerCase().includes(q)) ||
-          (c.video_title && c.video_title.toLowerCase().includes(q))
+      list = list.filter((c) =>
+        matchesQuery(c, searchQuery, (item) => [item.id, item.video_title])
       );
     }
 

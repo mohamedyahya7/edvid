@@ -10,6 +10,7 @@ import {
 import { useTheme } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { VideoCard } from '@/components/molecules/VideoCard';
+import { EmptyStateView } from '@/components/molecules/EmptyStateView';
 
 interface ExploreVideoGridProps {
   videos: any[];
@@ -65,12 +66,11 @@ export const ExploreVideoGrid: React.FC<ExploreVideoGridProps> = ({
       }
       ListEmptyComponent={
         !isLoading ? (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="search-outline" size={40} color="#8E8E93" style={{ marginBottom: 8 }} />
-            <Text style={[styles.emptyText, { color: colors.text }]}>
-              لا توجد دروس مطابقة للفلتر المحدد حالياً.
-            </Text>
-          </View>
+          <EmptyStateView
+            iconName="search-outline"
+            title="لا توجد دروس مطابقة للفلتر"
+            subtitle="جرب اختيار مادة أخرى أو مدرس آخر لعرض الدروس المتاحة."
+          />
         ) : null
       }
       renderItem={({ item }) => {

@@ -6,7 +6,8 @@ import {
   unfollowSubject,
 } from '@/lib/db/queries/subject.queries';
 import { useAppStore } from '@/lib/store';
-import { SyncService } from '@/services/SyncService';
+import { useSyncRefresh } from '@/hooks/useSyncRefresh';
+import { matchesQuery } from '@/utils/searchMatcher';
 
 export type SubjectFilterTab = 'all' | 'followed' | 'unfollowed';
 
@@ -21,7 +22,6 @@ export function useSubjectsScreen() {
   const db = useSQLiteContext();
   const [subjects, setSubjects] = useState<SubjectItemData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<SubjectFilterTab>('all');
 
@@ -33,7 +33,6 @@ export function useSubjectsScreen() {
       console.warn('fetchSubjects error:', e);
     } finally {
       setLoading(false);
-      setIsRefreshing(false);
     }
   }, [db]);
 
@@ -41,15 +40,10 @@ export function useSubjectsScreen() {
     fetchSubjects();
   }, [fetchSubjects]);
 
-  const onRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    try {
-      await SyncService.run(db, true);
-    } catch (e) {
-      console.warn('SyncService refresh error in Subjects:', e);
-    }
-    await fetchSubjects();
-  }, [db, fetchSubjects]);
+  // Reusable unified pull-to-refresh
+  const { isRefreshing, onRefresh } = useSyncRefresh(fetchSubjects, {
+    debugTag: 'Subjects',
+  });
 
   const handleToggleFollow = useCallback(
     async (subjectToToggle: SubjectItemData) => {
@@ -96,8 +90,9 @@ export function useSubjectsScreen() {
     }
 
     if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      result = result.filter((s) => (s.title || '').toLowerCase().includes(q));
+      result = result.filter((s) =>
+        matchesQuery(s, searchQuery, (item) => [item.title])
+      );
     }
 
     return result;

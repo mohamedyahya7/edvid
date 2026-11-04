@@ -8,45 +8,36 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@react-navigation/native';
-import { useSQLiteContext } from 'expo-sqlite';
+
 import { useAllTeachersScreen } from '@/hooks/useAllTeachersScreen';
 import { TeachersCatalogHeader } from '@/components/organisms/TeachersCatalogHeader';
 import { TeacherCatalogCard } from '@/components/molecules/TeacherCatalogCard';
-import { ThemedText } from '@/components/ui/ThemedText';
-import { SyncService } from '@/services/SyncService';
+import { EmptyStateView } from '@/components/molecules/EmptyStateView';
+import { useSyncRefresh } from '@/hooks/useSyncRefresh';
+import { matchesQuery } from '@/utils/searchMatcher';
 
 export default function AllTeachersScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const db = useSQLiteContext();
-  const params = useLocalSearchParams<{ subjectId?: string }>();
 
-  const { teachersBySubject, isLoading, refetchTeachers, toggleFollow } = useAllTeachersScreen();
+  const { teachersBySubject, isLoading, refetchTeachers, toggleFollow } =
+    useAllTeachersScreen();
 
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(
-    params.subjectId ? String(params.subjectId) : null
-  );
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const onRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await SyncService.run(db, true);
-    } catch (e) {
-      console.warn('SyncService refresh error in AllTeachers:', e);
-    }
-    await refetchTeachers();
-    setIsRefreshing(false);
-  };
+  // Unified pull-to-refresh
+  const { isRefreshing, onRefresh } = useSyncRefresh(refetchTeachers, {
+    debugTag: 'AllTeachers',
+  });
 
   const subjectTabs = useMemo(() => {
     return teachersBySubject.map((section) => ({
-      id: String(section.id),
+      id: section.id,
       title: section.title,
-      count: section.data ? section.data.length : 0,
+      count: (section.data || []).length,
     }));
   }, [teachersBySubject]);
 
@@ -60,19 +51,19 @@ export default function AllTeachersScreen() {
       const targetSection = teachersBySubject.find(
         (s) => String(s.id) === String(selectedSubjectId)
       );
-      list = targetSection && targetSection.data ? [...targetSection.data] : [];
+      list = targetSection ? targetSection.data || [] : [];
     } else {
       list = teachersBySubject.flatMap((s) => (s.data ? s.data : []));
     }
 
     if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      list = list.filter((t) => {
-        const nameMatch = t.name && t.name.toLowerCase().includes(q);
-        const subjectMatch = t.subject_title && t.subject_title.toLowerCase().includes(q);
-        const bioMatch = t.bio && t.bio.toLowerCase().includes(q);
-        return nameMatch || subjectMatch || bioMatch;
-      });
+      list = list.filter((t) =>
+        matchesQuery(t, searchQuery, (teacher) => [
+          teacher.name,
+          teacher.subject_title,
+          teacher.bio,
+        ])
+      );
     }
 
     return list;
@@ -80,7 +71,7 @@ export default function AllTeachersScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle={colors.text === '#FFFFFF' ? 'light-content' : 'dark-content'} />
 
       <TeachersCatalogHeader
         selectedSubjectId={selectedSubjectId}
@@ -109,9 +100,15 @@ export default function AllTeachersScreen() {
             />
           }
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <ThemedText style={styles.emptyTitle}>لا يوجد مدرسين مطابقين للبحث</ThemedText>
-            </View>
+            <EmptyStateView
+              iconName="people-outline"
+              title="لا يوجد مدرسين مطابقين للبحث"
+              subtitle={
+                searchQuery.trim()
+                  ? `لم نجد أي مدرس يطابق "${searchQuery}"`
+                  : 'لا يوجد معلمون مسجلون في هذا القسم حالياً'
+              }
+            />
           }
           renderItem={({ item }) => (
             <TeacherCatalogCard
@@ -138,14 +135,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  emptyContainer: {
-    paddingVertical: 48,
-    alignItems: 'center',
-  },
-  emptyTitle: {
-    fontSize: 14,
-    color: '#8E8E93',
-    fontWeight: '600',
   },
 });

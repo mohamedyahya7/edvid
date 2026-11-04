@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useSQLiteContext } from 'expo-sqlite';
 import { useAllTeachersScreen } from '@/hooks/useAllTeachersScreen';
-import { SyncService } from '@/services/SyncService';
+import { useSyncRefresh } from '@/hooks/useSyncRefresh';
+import { matchesQuery } from '@/utils/searchMatcher';
 
 export interface FollowedTeacher {
   id: string | number;
@@ -21,23 +21,15 @@ export interface SubjectTab {
 }
 
 export function useFollowedTeachersScreen() {
-  const db = useSQLiteContext();
   const { teachersBySubject, isLoading, refetchTeachers, toggleFollow } = useAllTeachersScreen();
 
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const onRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    try {
-      await SyncService.run(db, true);
-    } catch (e) {
-      console.warn('SyncService refresh error in FollowedTeachers:', e);
-    }
-    await refetchTeachers();
-    setIsRefreshing(false);
-  }, [db, refetchTeachers]);
+  // Reusable unified pull-to-refresh
+  const { isRefreshing, onRefresh } = useSyncRefresh(refetchTeachers, {
+    debugTag: 'FollowedTeachers',
+  });
 
   // Filter only followed teachers across all subject sections
   const allFollowedTeachers = useMemo<FollowedTeacher[]>(() => {
@@ -69,7 +61,7 @@ export function useFollowedTeachersScreen() {
     return Array.from(subjectsMap.values());
   }, [allFollowedTeachers]);
 
-  // Apply filters: Subject + Search Query
+  // Apply filters: Subject + Pure search matcher
   const displayedTeachers = useMemo<FollowedTeacher[]>(() => {
     let result = allFollowedTeachers;
 
@@ -78,12 +70,12 @@ export function useFollowedTeachersScreen() {
     }
 
     if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      result = result.filter(
-        (t) =>
-          (t.name && t.name.toLowerCase().includes(q)) ||
-          (t.subject_title && t.subject_title.toLowerCase().includes(q)) ||
-          (t.bio && t.bio.toLowerCase().includes(q))
+      result = result.filter((t) =>
+        matchesQuery(t, searchQuery, (teacher) => [
+          teacher.name,
+          teacher.subject_title,
+          teacher.bio,
+        ])
       );
     }
 
@@ -92,7 +84,6 @@ export function useFollowedTeachersScreen() {
 
   const handleUnfollow = useCallback(
     (id: string) => {
-      // currentStatus = true -> toggles to unfollow (false)
       toggleFollow(id, true);
     },
     [toggleFollow]

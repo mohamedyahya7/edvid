@@ -53,6 +53,15 @@
 - [x] **1.F.5**: شطر خطاف تفاصيل الفيديو `useVideoDetailController.ts` وتوزيع مسؤولياته على خطافات SRP متخصصة: `useVideoDownload.ts` و `useVideoPlayback.ts`.
 - [x] **1.F.6**: فحص TypeScript لكامل الفرونت إند بصفر أخطاء (`tsc --noEmit`) وتشغيل اختبارات الـ Units بنجاح 100%.
 
+### 🎯 الحزمة 1.G: توحيد آليات البحث، التبويبات، الهيدرات، وسحب التحديث (منجزة بالكامل ✅)
+- [x] **1.G.1**: إنشاء مكوّن البحث الذري الموحد [`components/atoms/SearchBar.tsx`](file:///f:/bamboo/frontend/components/atoms/SearchBar.tsx) وتطبيقه على كافة الشاشات مع دعم الـ RTL وزر المسح التلقائي.
+- [x] **1.G.2**: إنشاء مكوّن التبويبات الأفقية الموحد [`components/molecules/FilterTabsBar.tsx`](file:///f:/bamboo/frontend/components/molecules/FilterTabsBar.tsx) وإحلال كافة السكرولات المكررة.
+- [x] **1.G.3**: إنشاء شريط الهيدر الموحد [`components/molecules/ScreenHeaderBar.tsx`](file:///f:/bamboo/frontend/components/molecules/ScreenHeaderBar.tsx) المتكامل مع زر الرجوع الذري `BackButton`.
+- [x] **1.G.4**: ترقية مكوّن الشاشة الفارغة [`components/molecules/EmptyStateView.tsx`](file:///f:/bamboo/frontend/components/molecules/EmptyStateView.tsx) ليكون كائناً عاماً قابلاً لإعادة الاستخدام في كل الشاشات مع الحفاظ على التوافق الرجعي.
+- [x] **1.G.5**: إنشاء دالة البحث النصية النقية والمختبرة [`utils/searchMatcher.ts`](file:///f:/bamboo/frontend/utils/searchMatcher.ts) وإضافة اختبارات الـ Unit Tests الخاصة بها.
+- [x] **1.G.6**: إنشاء خطاف موحد لسحب التحديث وتزامن الخادم [`hooks/useSyncRefresh.ts`](file:///f:/bamboo/frontend/hooks/useSyncRefresh.ts) واستبدال الـ Booleans المكررة في كل الشاشات.
+- [x] **1.G.7**: التحقق الكامل عبر `tsc --noEmit` واجتياز اختبارات `npm run test:units` بنسبة 100%.
+
 ---
 
 ## 📅 المرحلة التالية المباشرة

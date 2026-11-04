@@ -1,5 +1,6 @@
 import { formatBytes, formatBytesEn } from '../formatBytes';
 import { filterLibraryVideos } from '../filterLibraryVideos';
+import { matchesQuery } from '../searchMatcher';
 import { LibraryVideoItem } from '@/types/library';
 
 function assert(condition: boolean, message: string) {
@@ -19,6 +20,15 @@ assert(formatBytes(1024 * 1024 * 50) === '50 ميغابايت', '50 MB Arabic fo
 assert(formatBytesEn(1024 * 1024 * 50) === '50 MB', '50 MB English format');
 assert(formatBytes(1024 * 1024 * 1024 * 1.5) === '1.5 غيغابايت', '1.5 GB Arabic format');
 console.log('✅ formatBytes tests passed.');
+
+// 2. Tests for searchMatcher
+const sampleUser = { id: 'U1', name: 'أحمد محمود', subject: 'فيزياء', bio: 'معلم أول للثانوية العامة' };
+assert(matchesQuery(sampleUser, '', (u) => [u.name, u.subject]) === true, 'Empty query should match anything');
+assert(matchesQuery(sampleUser, 'أحمد', (u) => [u.name, u.subject]) === true, 'Matching name');
+assert(matchesQuery(sampleUser, 'فيزياء', (u) => [u.name, u.subject]) === true, 'Matching subject');
+assert(matchesQuery(sampleUser, 'كيمياء', (u) => [u.name, u.subject]) === false, 'Non-matching query');
+assert(matchesQuery(sampleUser, 'ثانوية', (u) => [u.name, u.bio]) === true, 'Matching bio');
+console.log('✅ searchMatcher tests passed.');
 
 // 2. Tests for filterLibraryVideos
 const mockVideos: LibraryVideoItem[] = [

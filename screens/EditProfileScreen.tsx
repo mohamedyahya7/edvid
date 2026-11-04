@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEditProfileController } from '@/hooks/useEditProfileController';
 import { ProfileHeroCard } from '@/components/molecules/ProfileHeroCard';
 import { ProfileFormFields } from '@/components/molecules/ProfileFormFields';
+import { ScreenHeaderBar } from '@/components/molecules/ScreenHeaderBar';
 
 export default function EditProfileScreen() {
   const { colors } = useTheme();
@@ -47,18 +48,7 @@ export default function EditProfileScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       {/* Top Header Bar */}
-      <View style={[styles.headerBar, { borderBottomColor: colors.border, backgroundColor: colors.card }]}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => router.back()}
-          style={[styles.backBtn, { borderColor: colors.border, backgroundColor: colors.background }]}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons name="chevron-forward" size={22} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={[styles.screenTitle, { color: colors.text }]}>الملف الشخصي</Text>
-        <View style={{ width: 40 }} />
-      </View>
+      <ScreenHeaderBar title="الملف الشخصي" onBack={() => router.back()} />
 
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <ProfileHeroCard

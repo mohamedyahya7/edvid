@@ -16,6 +16,7 @@ import {
 } from '@/lib/db/queries/video.queries';
 import { ActivationService } from '@/api/ActivationService';
 import { SyncService } from '@/services/SyncService';
+import { useSyncRefresh } from '@/hooks/useSyncRefresh';
 
 export function useProfileScreen() {
   const router = useRouter();
@@ -35,7 +36,6 @@ export function useProfileScreen() {
   const [libraryVideosCount, setLibraryVideosCount] = useState(0);
   const [newestVideos, setNewestVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -66,22 +66,16 @@ export function useProfileScreen() {
     }
   }, [db]);
 
+  // Unified pull-to-refresh
+  const { isRefreshing, onRefresh } = useSyncRefresh(fetchData, {
+    debugTag: 'ProfileScreen',
+  });
+
   useEffect(() => {
     if (isFocused) {
       fetchData();
     }
   }, [isFocused, fetchData, lastSyncTimestamp, lastDownloadCompletedTimestamp]);
-
-  const onRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    try {
-      await SyncService.run(db, true);
-    } catch (e) {
-      console.warn('ProfileScreen sync error:', e);
-    }
-    await fetchData();
-    setIsRefreshing(false);
-  }, [db, fetchData]);
 
   const handleContinueWatchingPress = async (video: Video) => {
     if (!video) return;
