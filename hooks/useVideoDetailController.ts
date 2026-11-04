@@ -6,6 +6,8 @@ import { VideoModel, WatermarkConfig } from '@/types/video';
 import { getVideoDetails, updateVideoProgress } from '@/lib/db/queries/video.queries';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useAppStore } from '@/lib/store';
+import { useVideoDownload } from '@/hooks/useVideoDownload';
+import { useVideoPlayback } from '@/hooks/useVideoPlayback';
 
 export const useVideoDetailController = (initialVideoId?: string) => {
   const { id: paramId, streamUrl } = useLocalSearchParams<{ id?: string; streamUrl?: string }>();
@@ -17,8 +19,10 @@ export const useVideoDetailController = (initialVideoId?: string) => {
   const [otherVideos, setOtherVideos] = useState<VideoModel[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isUnlockModalVisible, setUnlockModalVisible] = useState<boolean>(false);
-  const [isDownloading, setIsDownloading] = useState<boolean>(false);
-  const [downloadProgress, setDownloadProgress] = useState<number>(0);
+
+  // Modular sub-hooks
+  const { isDownloading, downloadProgress, startDownload, deleteDownload } = useVideoDownload(video, setVideo);
+  const { updateProgress } = useVideoPlayback(db, videoId);
 
   // Student specific watermark config from authentication store
   const watermarkConfig: WatermarkConfig = {
@@ -59,7 +63,7 @@ export const useVideoDetailController = (initialVideoId?: string) => {
             ytId = 'dQw4w9WgXcQ';
           }
 
-          // Check if video is unlocked (enabled for testing YouTube resume)
+          // Check if video is unlocked
           const isUnlocked = true;
 
           const currentProgress = (details.progress_seconds && details.progress_seconds > 0)
@@ -144,53 +148,6 @@ export const useVideoDetailController = (initialVideoId?: string) => {
       Alert.alert('نجاح', 'تم تفعيل المحاضرة بنجاح!');
     }, 500);
   }, []);
-
-  const startDownload = useCallback(() => {
-    if (!video) return;
-    setIsDownloading(true);
-    setDownloadProgress(0);
-
-    const timer = setInterval(() => {
-      setDownloadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setIsDownloading(false);
-          setVideo((v) => (v ? { ...v, download_status: 'COMPLETED' } : null));
-          Alert.alert('اكتمل التحميل', 'تم حفظ الفيديو في المكتبة بنجاح للاستخدام بدون إنترنت.');
-          return 100;
-        }
-        return prev + 20;
-      });
-    }, 300);
-  }, [video]);
-
-  const deleteDownload = useCallback(() => {
-    Alert.alert(
-      'تأكيد الحذف',
-      'هل تريد مسح هذا الفيديو من ذاكرة الهاتف لتوفير المساحة؟',
-      [
-        { text: 'إلغاء', style: 'cancel' },
-        {
-          text: 'مسح',
-          style: 'destructive',
-          onPress: () => {
-            setVideo((v) => (v ? { ...v, download_status: 'NOT_DOWNLOADED' } : null));
-            Alert.alert('تم الحذف', 'تم مسح ملف الفيديو من ذاكرة الجهاز بنجاح.');
-          },
-        },
-      ]
-    );
-  }, []);
-
-  const updateProgress = useCallback((seconds: number) => {
-    if (!videoId) return;
-    const sec = Math.floor(seconds);
-    updateVideoProgress(db, videoId.toString(), sec)
-      .then(() => {
-        useAppStore.getState().actions.notifySyncCompleted();
-      })
-      .catch(() => {});
-  }, [db, videoId]);
 
   return {
     video,

@@ -45,6 +45,14 @@
 - [x] **1.E.3**: تشغيل خادم Expo Bundler على `exp://192.168.1.20:8081` واختباره.
 - [x] **1.E.4**: عمل Commit ودفع التغييرات بالكامل إلى GitHub (`cab4054`).
 
+### 🎯 الحزمة 1.F: تطهير ملفات القوالب وتفتيت مسارات التوجيه المتبقية (منجزة بالكامل ✅)
+- [x] **1.F.1**: أرشفة ملفات القوالب الميتة الستة (`Card`, `Collapsible`, `ExternalLink`, `HelloWave`, `ParallaxScrollView`, `ThemedText/View`) وملف البيانات `j.json` و `app-data-management-guide.md` في `frontend/legacy/`.
+- [x] **1.F.2**: تفتيت شاشة المدرسين المتابعين `app/teachers.tsx` من 380 سطراً إلى شاشة منفصلة `screens/FollowedTeachersScreen.tsx` مع جزيء `FollowedTeacherCard` وكائن `FollowedTeachersHeader` وخطاف `useFollowedTeachersScreen.ts`.
+- [x] **1.F.3**: تفتيت شاشة الأكواد المفعلة `app/used-codes.tsx` من 511 سطراً إلى شاشة منفصلة `screens/UsedCodesScreen.tsx` مع جزيء `UsedCodeCard` وكائن `UsedCodesHeader` وخطاف `useUsedCodes.ts`.
+- [x] **1.F.4**: تفتيت شاشة المواد `app/subjects.tsx` من 364 سطراً إلى `screens/SubjectsScreen.tsx` مع نقل `SubjectItem` و `SubjectListSkeleton` إلى `components/molecules/` وخطاف `useSubjectsScreen.ts`.
+- [x] **1.F.5**: شطر خطاف تفاصيل الفيديو `useVideoDetailController.ts` وتوزيع مسؤولياته على خطافات SRP متخصصة: `useVideoDownload.ts` و `useVideoPlayback.ts`.
+- [x] **1.F.6**: فحص TypeScript لكامل الفرونت إند بصفر أخطاء (`tsc --noEmit`) وتشغيل اختبارات الـ Units بنجاح 100%.
+
 ---
 
 ## 📅 المرحلة التالية المباشرة
