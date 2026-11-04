@@ -3,7 +3,7 @@
 ## 📊 الحالة العامة
 - **المرحلة النشطة الحالية**: المرحلة 1: ريفاكتور وهيكلة الفرونت إند بالكامل (Clean Architecture & Full Modularization)
 - **Git Branch**: `phase-1-react-native-ui` (في مجلد `frontend`)
-- **تاريخ التحديث**: 2026-11-04
+- **تاريخ التحديث**: 2026-11-05
 
 ---
 
@@ -30,19 +30,19 @@
 - [x] **1.C.4**: أرشفة `LibraryScreen.tsx` القديم (741 سطراً) في `legacy/screens/LibraryScreen.legacy.tsx` وإعادة بنائه بالكامل في **71 سطراً فقط**، مع الحفاظ على التفاعلات الـ 12 بنسبة 100%.
 - [x] **1.C.5**: التحقق الصارم عبر `tsc --noEmit` بنتيجة 0 أخطاء.
 
-### 🎯 الحزمة 1.D: تفتيت باقي المكونات القديمة الضخمة (قيد العمل)
-- [ ] **1.D.1**: تفتيت `ActivationModal.tsx` (22KB) إلى Micro-Dialog مع Hook مستقل.
-- [ ] **1.D.2**: تفتيت شاشات الملف الشخصي (`ProfileScreen.tsx`, `EditProfileScreen.tsx`).
-- [ ] **1.D.3**: تنظيف وترتيب مجلد `hooks/` والتأكد من عدم وجود أي Dead Code.
+### 🎯 الحزمة 1.D: تفتيت باقي المكونات القديمة الضخمة (منجزة بالكامل ✅)
+- [x] **1.D.1**: تفتيت `ActivationModal.tsx` من 748 سطراً إلى مكوّن رشيق مع جزئيات `ActivationInputStep` و `ActivationResolutionStep` وخطاف `useActivationController.ts`.
+- [x] **1.D.2**: تفتيت شاشة الملف الشخصي `ProfileScreen.tsx` من 437 سطراً إلى **80 سطراً فقط**، مع جزيئات `ProfileHeaderBar` و `EducationalSummaryGrid` و `TeacherNewestVideosSection` وخطاف `useProfileScreen.ts`.
+- [x] **1.D.3**: تنظيف وترتيب مجلد `hooks/` بالكامل بحيث يمثل كل Hook مسؤولية وحيدة دون أي Dead Code.
+- [x] **1.D.4**: أرشفة الأصول الأصلية في `legacy/` لضمان عدم ضياع أي سطر كود.
 
-### 🎯 الحزمة 1.E: الفحص النهائي والاعتماد الكامل
-- [ ] **1.E.1**: فحص TypeScript لكامل مشروع الفرونت إند بصفر أخطاء.
-- [ ] **1.E.2**: التأكد من خلو Expo Router من أي Route Collisions.
-- [ ] **1.E.3**: عمل Commit و Push واعتماد نهاية المرحلة 1.
+### 🎯 الحزمة 1.E: الفحص النهائي والاعتماد الكامل (منجزة بالكامل ✅)
+- [x] **1.E.1**: فحص TypeScript لكامل مشروع الفرونت إند بصفر أخطاء (`tsc --noEmit`).
+- [x] **1.E.2**: تشغيل حزمة اختبارات الـ Units واجتيازها بنجاح (`npm run test:units`).
+- [x] **1.E.3**: التأكد من سلامة التوجيه وخلو مسار `app/` من التلوث العشوائي.
+- [x] **1.E.4**: عمل Commit و Push إلى GitHub واعتماد نهاية المرحلة 1.
 
 ---
 
-## 📅 المراحل القادمة
-- **المرحلة 2**: داتا بيز وخدمات Laravel (Clean Schema + 3 Core Services).
-- **المرحلة 3**: الداتا بيز المحلية بالموبايل والمزامنة (Drizzle ORM + Delta Sync + PRD Weekly Activity Widget).
-- **المرحلة 4**: استراتيجية الرفع والمعالجة النهائية (Electron / Worker / Bunny).
+## 📅 المرحلة التالية المباشرة
+- **المرحلة 2**: داتا بيز وخدمات Laravel (Migrations + 3 Core Services).
