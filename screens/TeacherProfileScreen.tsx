@@ -1,17 +1,14 @@
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
-  Linking,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
 import { useTeacherProfileScreen } from '@/hooks/useTeacherProfileScreen';
-import { toggleFollowTeacher } from '@/lib/db/queries/teacher.queries';
 import { TeacherHeroHeader } from '@/components/molecules/TeacherHeroHeader';
 import { TeacherBioSection } from '@/components/molecules/TeacherBioSection';
 import { TeacherLessonsSection } from '@/components/organisms/TeacherLessonsSection';
@@ -20,45 +17,14 @@ import { ActionButton } from '@/components/atoms/ActionButton';
 export default function TeacherProfileScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const navigation = useNavigation();
-  const db = useSQLiteContext();
-
-  const { teacher, videos, isLoading, setTeacher } = useTeacherProfileScreen();
-
-  useEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
-
-  const handleToggleFollow = useCallback(async () => {
-    if (!teacher) return;
-    const newFollowStatus = !teacher.is_followed;
-    await toggleFollowTeacher(db, teacher.id, newFollowStatus);
-    // Optimistic UI state update
-    setTeacher({ ...teacher, is_followed: newFollowStatus });
-  }, [teacher, db, setTeacher]);
-
-  const handleWhatsApp = useCallback(() => {
-    if (teacher?.phone) {
-      const cleanPhone = teacher.phone.toString().replace(/[^0-9]/g, '');
-      const fullPhone = cleanPhone.startsWith('2') ? cleanPhone : `2${cleanPhone}`;
-      Linking.openURL(`https://wa.me/+${fullPhone}`);
-    }
-  }, [teacher?.phone]);
-
-  const handleOpenVideo = useCallback(
-    (id: string) => {
-      router.push({
-        pathname: '/video/[id]',
-        params: { id },
-      });
-    },
-    [router]
-  );
-
-  const freeLessonsCount = useMemo(
-    () => videos.filter((v) => v.video_type === 'free').length,
-    [videos]
-  );
+  const {
+    teacher,
+    videos,
+    isLoading,
+    freeLessonsCount,
+    handleToggleFollow,
+    handleWhatsApp,
+  } = useTeacherProfileScreen();
 
   if (isLoading) {
     return (
@@ -86,11 +52,7 @@ export default function TeacherProfileScreen() {
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* 1. Hero Cover Header with Top Action Bar */}
+      style={[styles.container, { backgroundColor: colors.background }]}>
       <TeacherHeroHeader
         teacherImage={teacher.profile_picture_url}
         teacherName={teacher.name}
@@ -100,7 +62,6 @@ export default function TeacherProfileScreen() {
         onWhatsApp={handleWhatsApp}
       />
 
-      {/* 2. Floating Teacher Bio Card with Follow Action & Metrics */}
       <TeacherBioSection
         bio={teacher.bio}
         isFollowed={Boolean(teacher.is_followed)}
@@ -111,10 +72,9 @@ export default function TeacherProfileScreen() {
         onWhatsApp={handleWhatsApp}
       />
 
-      {/* 3. Comprehensive Lessons List */}
       <TeacherLessonsSection
         videos={videos}
-        onOpenVideo={handleOpenVideo}
+        onOpenVideo={(id) => router.push({ pathname: '/video/[id]', params: { id } })}
       />
     </ScrollView>
   );
@@ -123,9 +83,6 @@ export default function TeacherProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
   },
   centerContainer: {
     flex: 1,

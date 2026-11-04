@@ -9,7 +9,7 @@ import {
 import { useTheme } from '@react-navigation/native';
 import { useProfileScreen } from '@/hooks/useProfileScreen';
 import { ProfileHeaderBar } from '@/components/molecules/ProfileHeaderBar';
-import { FeaturedContentCard } from '@/components/home/FeaturedContentCard';
+import { FeaturedContentCard } from '@/components/molecules/FeaturedContentCard';
 import { EducationalSummaryGrid } from '@/components/molecules/EducationalSummaryGrid';
 import { TeacherNewestVideosSection } from '@/components/organisms/TeacherNewestVideosSection';
 

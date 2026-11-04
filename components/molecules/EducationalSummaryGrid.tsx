@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SectionHeader } from '@/components/molecules/SectionHeader';
-import { InfoRowCard } from '@/components/home/InfoRowCard';
+import { InfoRowCard } from '@/components/molecules/InfoRowCard';
 
 interface EducationalSummaryGridProps {
   followedSubjectsCount: number;

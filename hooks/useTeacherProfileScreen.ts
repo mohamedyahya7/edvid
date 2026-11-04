@@ -1,10 +1,11 @@
-import { getTeacherDetails } from "@/lib/db/queries/teacher.queries";
-import { Video } from "@/lib/store/types";
-import { useAppStore } from "@/lib/store";
-import { useAuthStore } from "@/lib/store/authStore";
-import { useLocalSearchParams } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Linking } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
+import { getTeacherDetails, toggleFollowTeacher } from '@/lib/db/queries/teacher.queries';
+import { Video } from '@/lib/store/types';
+import { useAppStore } from '@/lib/store';
+import { useAuthStore } from '@/lib/store/authStore';
 
 export interface Teacher {
   id: string;
@@ -36,7 +37,7 @@ export const useTeacherProfileScreen = () => {
           setTeacher(teacher);
           setVideos(videos);
         } catch (error) {
-          console.error("Failed to fetch teacher details:", error);
+          console.error('Failed to fetch teacher details:', error);
         } finally {
           setIsLoading(false);
         }
@@ -45,5 +46,33 @@ export const useTeacherProfileScreen = () => {
     fetchTeacherData();
   }, [id, db, gradeIdToUse]);
 
-  return { teacher, videos, isLoading, id, setTeacher };
+  const handleToggleFollow = useCallback(async () => {
+    if (!teacher) return;
+    const newFollowStatus = !teacher.is_followed;
+    await toggleFollowTeacher(db, teacher.id, newFollowStatus);
+    setTeacher({ ...teacher, is_followed: newFollowStatus });
+  }, [teacher, db]);
+
+  const handleWhatsApp = useCallback(() => {
+    if (teacher?.phone) {
+      const cleanPhone = teacher.phone.toString().replace(/[^0-9]/g, '');
+      const fullPhone = cleanPhone.startsWith('2') ? cleanPhone : `2${cleanPhone}`;
+      Linking.openURL(`https://wa.me/+${fullPhone}`);
+    }
+  }, [teacher?.phone]);
+
+  const freeLessonsCount = useMemo(
+    () => videos.filter((v) => v.video_type === 'free').length,
+    [videos]
+  );
+
+  return {
+    teacher,
+    videos,
+    isLoading,
+    id,
+    freeLessonsCount,
+    handleToggleFollow,
+    handleWhatsApp,
+  };
 };
