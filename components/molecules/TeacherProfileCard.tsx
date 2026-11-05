@@ -10,7 +10,7 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@react-navigation/native';
 import { VideoModel } from '@/types/video';
 import { TeacherMetaRow } from '@/components/molecules/TeacherMetaRow';
-import { ThemedText } from '@/components/ui/ThemedText';
+import { ThemedText } from '@/components/atoms/ThemedText';
 
 interface TeacherProfileCardProps {
   video: VideoModel;

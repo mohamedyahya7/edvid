@@ -1,13 +1,11 @@
-import { ThemedText } from "@/components/ui/ThemedText";
-import { ThemedView } from "@/components/ui/ThemedView";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { router } from "expo-router";
+import { useTheme } from "@react-navigation/native";
+import { useSQLiteContext } from "expo-sqlite";
 import { getGrades } from "@/lib/db/queries/grade.queries";
 import { saveSetting } from "@/lib/db/queries/settings.queries";
 import { useAppActions } from "@/lib/store";
-import { useTheme } from "@react-navigation/native";
-import { router } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function SelectGradeScreen() {
   const db = useSQLiteContext();
@@ -42,25 +40,25 @@ export default function SelectGradeScreen() {
 
   if (isLoading) {
     return (
-      <ThemedView style={styles.container}>
-        <ActivityIndicator size="large" />
-      </ThemedView>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Select Your Grade</ThemedText>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.title, { color: colors.text }]}>Select Your Grade</Text>
       {grades.map((grade) => (
         <TouchableOpacity
           key={grade.id}
-          style={[styles.gradeButton, { backgroundColor: colors.card }]}
+          style={[styles.gradeButton, { backgroundColor: colors.card, borderColor: colors.border }]}
           onPress={() => handleSelectGrade(grade.id)}
         >
-          <ThemedText style={styles.gradeButtonText}>{grade.title}</ThemedText>
+          <Text style={[styles.gradeButtonText, { color: colors.text }]}>{grade.title}</Text>
         </TouchableOpacity>
       ))}
-    </ThemedView>
+    </View>
   );
 }
 
@@ -77,18 +75,19 @@ const styles = StyleSheet.create({
   },
   gradeButton: {
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 14,
+    borderWidth: 1,
     marginBottom: 15,
     width: "80%",
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   gradeButtonText: {
-    fontSize: 18,
-    fontWeight: "500",
+    fontSize: 16.5,
+    fontWeight: "600",
   },
 });

@@ -62,6 +62,14 @@
 - [x] **1.G.6**: إنشاء خطاف موحد لسحب التحديث وتزامن الخادم [`hooks/useSyncRefresh.ts`](file:///f:/bamboo/frontend/hooks/useSyncRefresh.ts) واستبدال الـ Booleans المكررة في كل الشاشات.
 - [x] **1.G.7**: التحقق الكامل عبر `tsc --noEmit` واجتياز اختبارات `npm run test:units` بنسبة 100%.
 
+### 🎯 الحزمة 1.H: تنظيف الـ Layout، أرشفة components/ui، وحل تفاعل الـ Dark Mode الفوري (منجزة بالكامل ✅)
+- [x] **1.H.1**: إزالة مجلد `dist/` المولد تلقائياً لتنظيف مساحة ومستودع الكود.
+- [x] **1.H.2**: توحيد أيقونات التاب بار في [`app/(tabs)/_layout.tsx`](file:///f:/bamboo/frontend/app/\(tabs\)/_layout.tsx) على `Ionicons` فقط وإزالة الـ 3 مكتبات المتضاربة.
+- [x] **1.H.3**: نقل `ThemedText` إلى مكون ذري حقيقي [`components/atoms/ThemedText.tsx`](file:///f:/bamboo/frontend/components/atoms/ThemedText.tsx) وأرشفة مجلد `components/ui` بالكامل في `legacy/components/ui/`.
+- [x] **1.H.4**: حل مشكلة عدم استجابة الـ Dark Mode اللحظية بإنشاء [`hooks/useDynamicTheme.ts`](file:///f:/bamboo/frontend/hooks/useDynamicTheme.ts) المستند مباشرة إلى `Appearance.addChangeListener` مع تزامن فوري في 0ms بين Navigation و Paper Provider و StatusBar.
+- [x] **1.H.5**: تفكيك [`app/_layout.tsx`](file:///f:/bamboo/frontend/app/_layout.tsx) وعزل الثيمات في [`constants/theme.ts`](file:///f:/bamboo/frontend/constants/theme.ts)، وحماية المسارات في [`hooks/useProtectedRoute.ts`](file:///f:/bamboo/frontend/hooks/useProtectedRoute.ts)، ومهام النظام في [`hooks/useAppBootstrap.ts`](file:///f:/bamboo/frontend/hooks/useAppBootstrap.ts).
+- [x] **1.H.6**: فحص الـ TypeScript بصفر أخطاء (`tsc --noEmit`) ونجاح 100% لاختبارات الـ Units.
+
 ---
 
 ## 📅 المرحلة التالية المباشرة

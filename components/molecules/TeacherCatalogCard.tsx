@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/ui/ThemedText';
+import { ThemedText } from '@/components/atoms/ThemedText';
 
 interface TeacherCatalogCardProps {
   teacher: any;

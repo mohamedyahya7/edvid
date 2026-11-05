@@ -1,5 +1,5 @@
 import { Grade, GradeService } from "@/api/GradeService";
-import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedText } from "@/components/atoms/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useAuthStore } from "@/lib/store/authStore";
 import { Ionicons } from "@expo/vector-icons";

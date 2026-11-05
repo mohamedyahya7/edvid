@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@react-navigation/native';
 import { storageUrl } from '@/api/Axios';
 import { TeacherMetaRow } from '@/components/molecules/TeacherMetaRow';
-import { ThemedText } from '@/components/ui/ThemedText';
+import { ThemedText } from '@/components/atoms/ThemedText';
 
 export interface VideoCardProps {
   id: string | number;
