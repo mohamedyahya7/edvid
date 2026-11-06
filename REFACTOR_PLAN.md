@@ -144,34 +144,131 @@ frontend/
 
 ---
 
-## 🗄️ المرحلة 2: تعديلات داتا بيز وخدمات Laravel ومعمارية Edge-Zero الكاشية
+## 🗄️ المرحلة 2: داتا بيز وخدمات Laravel المعمارية المتقدمة (Backend Clean Architecture & Video Security)
 *(الفرع القادم: `phase-2-laravel-backend`)*
-- [ ] **Migrations & Schema Normalization:**
-  - إضافة أعمدة الـ HLS وجدول `video_encryption_keys` وتصحيح `codes.expires_at`.
-  - إضافة جداول التقييمات: `video_ratings` و `teacher_ratings` لحساب متوسطات التقييم (1 إلى 5 نجوم).
-- [ ] **Pre-Warmed Grade Cache (كاش المراحل الدراسية المجهز مسبقاً):**
-  - تجهيز وتوليد لقطات دورية مكيشة بالكامل لكل مرحلة دراسية (`grade_{id}_catalog_snapshot`) في Redis / Cache.
-  - هدف المعمارية: عندما يفتح طالب (مثلاً الصف الثالث الإعدادي) التطبيق، يحصل على كامل المحتوى بـ Delta Sync من الكاش المجهز في ميلي ثانية واحدة دون تنفيذ استعلامات Relational متكررة على MySQL، لتخزينها محلياً في SQLite الطالب.
-- [ ] **Fast Telemetry & Ratings Ingestion Buffer:**
-  - بناء نقطة استقبال دفعات مجمعة (Batch Ingestion API) لتقييمات الطلاب وسجلات ثواني المشاهدة.
-  - حقن البيانات فوراً في Redis Queue / Staging Buffer والرد في أقل من 20ms دون لمس جداول MySQL الرئيسية أثناء ساعات الذروة.
-- [ ] **Idle-Time Worker / Nightly Cron (معالجة أوقات هدوء السيرفر المشترك):**
-  - جدولة معالجة التقييمات وإحصائيات الطلاب وحساب المتوسطات الموزونة في نافذة هدوء السيرفر (Server Idle Window)، مع الأخذ في الاعتبار مشاركة السيرفر مع أنظمة أخرى عبر تشغيل منخفض الأولوية (`low-priority background worker`).
-- [ ] **Core Backend Services:**
-  - بناء `CodeRedemptionService` مع Atomic Locking لمنع الـ Race Conditions.
-  - بناء `VideoDeliveryService` لتسليم الـ Signed URLs وروابط HLS والمفاتيح المحمية.
-  - بناء `VideoProcessingService` بنمط Strategy Pattern (دعم المعالجة المحلية / Bunny / VPS).
+
+### 2.1 المبادئ الصارمة للباك إند (Grill-Me Backend Standards)
+1. **Clean Code & SOLID / Thin Controllers:**
+   - منع كتابة أي منطق أعمال (Business Logic) أو استعلامات داتابيز مباشرة أو عمليات تحقق يدوي داخل الـ Controllers.
+   - تحويل كل طلب وارد إلى **FormRequest** مخصص يضمن الـ Validation والـ Authorization الصارم.
+   - تفويض كل إجراء إلى **Action / Service Layer** أحادي المسؤولية (Single Responsibility).
+   - توحيد مخرجات الـ API عبر **API Resources (JsonResource)** لمنع تسريب أسماء الحقول أو العلاقات الداخلية وحماية العقد البرمجي مع الموبايل.
+2. **نمط الاستراتيجية لإدارة وتوزيع الفيديوهات (Video Provider Strategy Pattern):**
+   - عزل مزودي الفيديوهات (YouTube vs Backblaze B2 vs HLS) عبر عقد موحد `VideoProviderInterface`.
+   - اختيار المزود ديناميكياً عبر `VideoProviderFactory` دون تعديل الكنترولر.
+   - دعم الفيديوهات المجانية (YouTube) والمدفوعة عالية الحماية (Backblaze B2 عبر التوكنات الموقعة، و HLS المشفر AES-128).
+3. **أمان الرموز ومنع سباق العمليات (Race Condition & Atomic Locks):**
+   - إحكام استهلاك وتفعيل أكواد الشحن عبر `Cache::lock('code:' . $code, 10)` لمنع استهلاك الكود مرتين بالتزامن من جهازين مختلفين.
+   - التحقق الصارم من ربط الكود بالـ `device_id` وحساب عدد مرات المشاهدة والتحميل المتبقية بدقة ذرية.
+4. **مبدأ Edge-Zero وكاشات الكتالوج فائقة الخفة (Zero-Load Snapshot Caching):**
+   - تجهيز كاش كتالوج المراحل الدراسية `grade_{id}_catalog_snapshot` مسبقاً (Pre-warmed) وتحديثه عند تغيير البيانات فقط.
+   - إصلاح خلل `If-Modified-Since` و `Last-Modified` لترجيع `304 Not Modified` فوري دون إرهاق MySQL باستعلامات الربط الثقيلة.
+5. **استيعاب بيانات التيليميتري والتقييمات المجمعة دون ضغط السيرفر (Batch Telemetry & Low-Load Cron):**
+   - استقبال تقارير المشاهدة (عدد الثواني ونسبة الإكمال) والتقييمات بالنجوم (1-5) في حمولة مجمعة (`POST /api/v1/telemetry/batch`).
+   - ضخ البيانات فوراً في طابور Redis Buffer خفيف (`RPUSH telemetry_queue`) مع استجابة 200 OK في أقل من 15ms.
+   - تفريغ الطابور وتحديث جداول MySQL وحساب متوسطات التقييمات في أوقات هدوء السيرفر (Low-Load Windows) لتفادي التأثير على الأنظمة الأخرى المشتركة على نفس السيرفر.
+
+---
+
+### 2.2 الهيكل النموذجي المستهدف لمجلد `backend/app/`
+```text
+backend/app/
+├── Http/
+│   ├── Controllers/Api/V1/
+│   │   ├── AuthController.php              # تسجيل ودخول خفيف
+│   │   ├── CatalogController.php           # كاش الكتالوج مع دعم 304 الصارم
+│   │   ├── CodeValidationController.php    # كنترولر نحيف مفوض لـ CodeRedemptionService
+│   │   ├── VideoController.php             # تسليم روابط التشغيل والتحميل عبر VideoDeliveryService
+│   │   ├── TelemetryController.php         # استقبال دفعات التيليميتري والتقييمات في Redis
+│   │   └── StudentInteractionController.php# تفاعلات الإعجاب والمتابعة
+│   │
+│   ├── Requests/Api/V1/
+│   │   ├── ValidateCodeRequest.php
+│   │   ├── RequestDownloadRequest.php
+│   │   ├── BatchTelemetryRequest.php
+│   │   └── InteractionRequest.php
+│   │
+│   └── Resources/Api/V1/
+│       ├── CatalogResource.php
+│       ├── VideoResource.php
+│       ├── TeacherResource.php
+│       ├── CodeValidationResource.php
+│       └── PlaybackResource.php
+│
+├── Services/
+│   ├── Video/                              # تطبيق نمط الاستراتيجية بالكامل
+│   │   ├── Contracts/
+│   │   │   └── VideoProviderInterface.php  # عقد المزود (Playback, Download, Keys)
+│   │   ├── Providers/
+│   │   │   ├── YouTubeVideoProvider.php    # استراتيجية اليوتيوب (Embed & yt-dlp)
+│   │   │   ├── BackblazeB2VideoProvider.php# استراتيجية B2 (Signed JWT & Temp URLs)
+│   │   │   └── HlsStreamVideoProvider.php  # استراتيجية HLS (AES-128 Encryption)
+│   │   ├── DTOs/
+│   │   │   ├── PlaybackPayload.php
+│   │   │   └── DownloadOption.php
+│   │   └── VideoProviderFactory.php        # مصنع اختيار المزود المناسب للطلب
+│   │
+│   ├── CodeRedemptionService.php           # منطق استهلاك الأكواد مع Atomic Lock
+│   ├── VideoDeliveryService.php            # فحص الصلاحيات وطلب الروابط من المصنع
+│   ├── PreWarmedCatalogService.php         # تجهيز وحفظ كاش المراحل الدراسية
+│   └── TelemetryBatchService.php           # إدارة طابور التيليميتري في Redis
+│
+├── Console/Commands/
+│   ├── PrewarmCatalogCacheCommand.php      # أمر artisan لتجهيز كاش الكتالوج مسبقاً
+│   └── ProcessTelemetryQueueCommand.php    # معالجة تيليميتري والتقييمات في أوقات الهدوء
+│
+└── Models/
+    ├── Video.php                           # علاقات مزود الفيديو والتقييمات
+    ├── VideoRating.php                     # تقييمات الفيديوهات (1-5 نجوم)
+    ├── TeacherRating.php                   # تقييمات المدرسين (1-5 نجوم)
+    └── VideoEncryptionKey.php              # مفاتيح تشفير HLS (AES-128)
+```
+
+---
+
+### 2.3 خطة المهام التنفيذية المصغرة للمرحلة 2 (Bite-Sized Sub-Phases)
+
+#### 🎯 الحزمة 2.A: داتا بيز ونمذجة البيانات (Database Migrations & Models)
+- [ ] **المهمة 2.A.1:** إنشاء Migration لجدول `video_ratings` (مع Unique Index مركب على `[student_id, video_id]`) ونموذج `VideoRating.php`.
+- [ ] **المهمة 2.A.2:** إنشاء Migration لجدول `teacher_ratings` (مع Unique Index مركب على `[student_id, teacher_id]`) ونموذج `TeacherRating.php`.
+- [ ] **المهمة 2.A.3:** إنشاء Migration لجدول `video_encryption_keys` (حفظ مفاتيح AES-128 و IV و Hash) ونموذج `VideoEncryptionKey.php`.
+- [ ] **المهمة 2.A.4:** إنشاء Migration لتحديث جدول `videos` (إضافة `provider_type enum('youtube', 'backblaze_b2', 'hls')`، مسار `hls_path`، مفتاح `encryption_key_id`، حالة `status`، تاريخ النشر `published_at`).
+- [ ] **المهمة 2.A.5:** إنشاء Migration لفهرسة حقول البحث والفرز في جدولي `codes` و `videos`.
+
+#### 🎯 الحزمة 2.B: نمط استراتيجية مزودي الفيديوهات (Video Provider Strategy Pattern)
+- [ ] **المهمة 2.B.1:** إنشاء العقد `App\Services\Video\Contracts\VideoProviderInterface` والـ DTOs (`PlaybackPayload`, `DownloadOption`).
+- [ ] **المهمة 2.B.2:** بناء استراتيجية `YouTubeVideoProvider` للتعامل مع فيديوهات اليوتيوب المجانية وروابط التحميل المستخرجة.
+- [ ] **المهمة 2.B.3:** بناء استراتيجية `BackblazeB2VideoProvider` للتعامل مع تخزين B2 وتوليد توكنات JWT الموقعة وروابط التحميل المؤقتة مع صلاحية زمنية محددة.
+- [ ] **المهمة 2.B.4:** بناء استراتيجية `HlsStreamVideoProvider` لإعداد قوائم تشغيل m3u8 المحمية ونقاط تسليم مفاتيح التشفير.
+- [ ] **المهمة 2.B.5:** بناء `VideoProviderFactory` لربط الموديل تلقائياً بالمزود المناسب مع آليات Fallback الذكية للبيانات القديمة.
+
+#### 🎯 الحزمة 2.C: الخدمات الأساسية والأمان الذري (Core Backend Services & FormRequests)
+- [ ] **المهمة 2.C.1:** بناء FormRequests الصارمة: `ValidateCodeRequest`, `RequestDownloadRequest`, `BatchTelemetryRequest`.
+- [ ] **المهمة 2.C.2:** بناء `CodeRedemptionService` مع القفل الذري `Cache::lock` لمنع مشاكل الـ Race Condition وضمان استهلاك الكود بأمان.
+- [ ] **المهمة 2.C.3:** بناء `VideoDeliveryService` لتسليم روابط المشاهدة والتحميل المفحوصة ومفاتيح التشفير للأجهزة المصرح لها فقط.
+- [ ] **المهمة 2.C.4:** بناء `PreWarmedCatalogService` لمعالجة الكتالوج مسبقاً وتصحيح هيدرز HTTP 304 `Last-Modified`.
+- [ ] **المهمة 2.C.5:** بناء `TelemetryBatchService` و أوامر المعالجة الهادئة في أوقات الهدوء (Low-Load Off-Peak Schedule).
+
+#### 🎯 الحزمة 2.D: تنحيف الكنترولرز وبناء موارد الـ API (Thin Controllers & API Resources)
+- [ ] **المهمة 2.D.1:** بناء API Resources موحدة (`CatalogResource`, `VideoResource`, `TeacherResource`, `CodeValidationResource`).
+- [ ] **المهمة 2.D.2:** إعادة هيكلة `CodeValidationController` ليصبح نحيفاً للغاية (< 50 سطراً) مفوضاً لـ `CodeRedemptionService`.
+- [ ] **المهمة 2.D.3:** إعادة هيكلة `CatalogController` للاعتماد على `PreWarmedCatalogService` وتطبيق كاش 304 بدقة.
+- [ ] **المهمة 2.D.4:** إضافة نقاط النهاية الجديدة في `routes/api.php` (`/telemetry/batch`, `/video/playback`, `/video/download`, `/ratings`).
+
+#### 🎯 الحزمة 2.E: الفحص والاختبار الشامل (Full Backend Verification)
+- [ ] **المهمة 2.E.1:** تشغيل فحص الـ Syntax والـ Static Analysis لكافة ملفات الـ Backend.
+- [ ] **المهمة 2.E.2:** اختبار استهلاك الأكواد المتزامن ومحاكاة Race Condition والتأكد من إحكام القفل الذري.
+- [ ] **المهمة 2.E.3:** اختبار استجابة الكتالوج والتأكد من رجوع `304 Not Modified` بصفر استعلامات SQL.
+- [ ] **المهمة 2.E.4:** اعتماد المرحلة 2 والدمج.
 
 ---
 
 ## ⚡ المرحلة 3: الداتا بيز المحلية بالموبايل والمزامنة (Drizzle ORM & Delta Sync)
 *(الفرع القادم: `phase-3-local-db-sync`)*
-- [ ] إعداد `Drizzle ORM` مع `expo-sqlite` بالـ Schema المطابقة لعقد الباك إند الجديد.
-- [ ] **Local Write-First Architecture (طابور العمليات المحلية للأوفلاين):**
-  - حفظ التقييمات (Likes / Ratings) وثواني المشاهدة محلياً في SQLite الطالب في 0ms مع تفاعل لحظي للواجهة بدون انتظار الإنترنت.
-  - تجميع العمليات ورفعها كـ Batch Payload مجمع كل عدة ساعات أو عند إغلاق التطبيق / الاتصال بالـ Wi-Fi.
-- [ ] دمج وثيقة النشاط الأسبوعي ومعدل الإنجاز (`PRD_WEEKLY_ACTIVITY_WIDGET.md`) في جداول SQLite المحلية لحساب إحصائيات المذاكرة دون استهلاك باندويث السيرفر.
-- [ ] تشفير المفاتيح والرموز الحساسة في `expo-secure-store`.
+- [ ] إعداد `Drizzle ORM` مع `expo-sqlite` بالـ Schema المطابقة لعقد الباك إند.
+- [ ] دمج وثيقة النشاط الأسبوعي ومعدل الإنجاز (`PRD_WEEKLY_ACTIVITY_WIDGET.md`) في جداول SQLite.
+- [ ] بناء محرك المزامنة الذكي (Pull/Push Delta Sync).
+- [ ] تشفير المفاتيح في `expo-secure-store`.
 
 ---
 
@@ -179,14 +276,3 @@ frontend/
 *(الفرع القادم: `phase-4-upload-strategy`)*
 - [ ] حسم الخيار (تطبيق Electron للسناتر / Bunny.net / Worker VPS).
 - [ ] ربط خط الإنتاج من الرفع والتشفير حتى التشغيل الأوفلاين.
-
----
-
-## 💎 خطة التطوير البصري والـ UI/UX فائق الجودة (High Prime UI Architecture)
-*(تدرج مستقبلي في مرحلة تلميع الواجهات والاستعراض النهائي)*
-- [ ] **Liquid Glass & Glassmorphism (`expo-blur`):** إدراج خامات الزجاج السائل `BlurView` الشفافة في التاب بار وهيدرات التصفح والـ Modals مع تدرجات رقيقة ومحاذاة ديناميكية للألوان بحسب الثيم.
-- [ ] **حركات ميكرو دقيقة (`react-native-reanimated` + `react-native-gesture-handler`):** إضافة تفاعلات لمس زنبركية (Spring Pressables)، وحركات دخول وانتقال سلسة للكروت والقوائم (Shared Element Transitions).
-- [ ] **الترقية للهيدرات الناتيف الذكية (Native Stack Headers):** اعتماد الهيدرات الناتيف ذات العناوين الكبيرة المتقلصة (iOS Large Title collapse on scroll) للشاشات البسيطة (الإعدادات، الملف الشخصي، تفاصيل المحتوى) مع الحفاظ على Compound View Headers لشاشات الفلاتر والبحث لتفادي أخطاء الـ RTL في أندرويد.
-- [ ] **إعادة هيكلة ملف الطالب والإعدادات (Portfolio & Advanced Settings Separation):**
-  - **ملف الطالب (Student Portfolio):** إحصائيات المذاكرة والنشاط الأسبوعي، مؤشر الساعات المكتملة، شارات الإنجاز (Achievements & Streaks)، وبيانات الطالب التعليمية.
-  - **مركز الإعدادات (Settings Center):** مظهر التطبيق (فاتح/داكن/تلقائي)، تفضيلات التخزين والأوفلاين (حد التخزين، مسح الكاش)، إعدادات مشغل الفيديو (السرعة الافتراضية، تخطي الإنترو)، وإدارة الأجهزة المسجلة لمنع مشاركة الحساب.

@@ -1,9 +1,9 @@
 # متابعة تنفيذ الريفاكتور (PROGRESS.md)
 
 ## 📊 الحالة العامة
-- **المرحلة النشطة الحالية**: نهاية المرحلة 1: ريفاكتور وهيكلة الفرونت إند بالكامل (Clean Architecture & Full Modularization)
-- **Git Branch**: `phase-1-react-native-ui` (في مجلد `frontend`)
-- **تاريخ التحديث**: 2026-11-05
+- **المرحلة النشطة الحالية**: إنجاز المرحلة 2 بالكامل (Laravel Backend Clean Architecture & Video Security Suite) والتجهيز لـ المرحلة 3
+- **Git Branch**: `phase-2-laravel-backend` (في مجلد `backend`)
+- **تاريخ التحديث**: 2026-11-06
 
 ---
 
@@ -45,44 +45,44 @@
 - [x] **1.E.3**: تشغيل خادم Expo Bundler على `exp://192.168.1.20:8081` واختباره.
 - [x] **1.E.4**: عمل Commit ودفع التغييرات بالكامل إلى GitHub (`cab4054`).
 
-### 🎯 الحزمة 1.F: تطهير ملفات القوالب وتفتيت مسارات التوجيه المتبقية (منجزة بالكامل ✅)
-- [x] **1.F.1**: أرشفة ملفات القوالب الميتة الستة (`Card`, `Collapsible`, `ExternalLink`, `HelloWave`, `ParallaxScrollView`, `ThemedText/View`) وملف البيانات `j.json` و `app-data-management-guide.md` في `frontend/legacy/`.
-- [x] **1.F.2**: تفتيت شاشة المدرسين المتابعين `app/teachers.tsx` من 380 سطراً إلى شاشة منفصلة `screens/FollowedTeachersScreen.tsx` مع جزيء `FollowedTeacherCard` وكائن `FollowedTeachersHeader` وخطاف `useFollowedTeachersScreen.ts`.
-- [x] **1.F.3**: تفتيت شاشة الأكواد المفعلة `app/used-codes.tsx` من 511 سطراً إلى شاشة منفصلة `screens/UsedCodesScreen.tsx` مع جزيء `UsedCodeCard` وكائن `UsedCodesHeader` وخطاف `useUsedCodes.ts`.
-- [x] **1.F.4**: تفتيت شاشة المواد `app/subjects.tsx` من 364 سطراً إلى `screens/SubjectsScreen.tsx` مع نقل `SubjectItem` و `SubjectListSkeleton` إلى `components/molecules/` وخطاف `useSubjectsScreen.ts`.
-- [x] **1.F.5**: شطر خطاف تفاصيل الفيديو `useVideoDetailController.ts` وتوزيع مسؤولياته على خطافات SRP متخصصة: `useVideoDownload.ts` و `useVideoPlayback.ts`.
-- [x] **1.F.6**: فحص TypeScript لكامل الفرونت إند بصفر أخطاء (`tsc --noEmit`) وتشغيل اختبارات الـ Units بنجاح 100%.
+---
 
-### 🎯 الحزمة 1.G: توحيد آليات البحث، التبويبات، الهيدرات، وسحب التحديث (منجزة بالكامل ✅)
-- [x] **1.G.1**: إنشاء مكوّن البحث الذري الموحد [`components/atoms/SearchBar.tsx`](file:///f:/bamboo/frontend/components/atoms/SearchBar.tsx) وتطبيقه على كافة الشاشات مع دعم الـ RTL وزر المسح التلقائي.
-- [x] **1.G.2**: إنشاء مكوّن التبويبات الأفقية الموحد [`components/molecules/FilterTabsBar.tsx`](file:///f:/bamboo/frontend/components/molecules/FilterTabsBar.tsx) وإحلال كافة السكرولات المكررة.
-- [x] **1.G.3**: إنشاء شريط الهيدر الموحد [`components/molecules/ScreenHeaderBar.tsx`](file:///f:/bamboo/frontend/components/molecules/ScreenHeaderBar.tsx) المتكامل مع زر الرجوع الذري `BackButton`.
-- [x] **1.G.4**: ترقية مكوّن الشاشة الفارغة [`components/molecules/EmptyStateView.tsx`](file:///f:/bamboo/frontend/components/molecules/EmptyStateView.tsx) ليكون كائناً عاماً قابلاً لإعادة الاستخدام في كل الشاشات مع الحفاظ على التوافق الرجعي.
-- [x] **1.G.5**: إنشاء دالة البحث النصية النقية والمختبرة [`utils/searchMatcher.ts`](file:///f:/bamboo/frontend/utils/searchMatcher.ts) وإضافة اختبارات الـ Unit Tests الخاصة بها.
-- [x] **1.G.6**: إنشاء خطاف موحد لسحب التحديث وتزامن الخادم [`hooks/useSyncRefresh.ts`](file:///f:/bamboo/frontend/hooks/useSyncRefresh.ts) واستبدال الـ Booleans المكررة في كل الشاشات.
-- [x] **1.G.7**: التحقق الكامل عبر `tsc --noEmit` واجتياز اختبارات `npm run test:units` بنسبة 100%.
+## 🚦 قائمة المهام التفصيلية للمرحلة 2 (Laravel Backend Architecture & Video Security - منجزة بالكامل ✅)
 
-### 🎯 الحزمة 1.H: تنظيف الـ Layout، أرشفة components/ui، وحل تفاعل الـ Dark Mode الفوري (منجزة بالكامل ✅)
-- [x] **1.H.1**: إزالة مجلد `dist/` المولد تلقائياً لتنظيف مساحة ومستودع الكود.
-- [x] **1.H.2**: توحيد أيقونات التاب بار في [`app/(tabs)/_layout.tsx`](file:///f:/bamboo/frontend/app/\(tabs\)/_layout.tsx) على `Ionicons` فقط وإزالة الـ 3 مكتبات المتضاربة.
-- [x] **1.H.3**: نقل `ThemedText` إلى مكون ذري حقيقي [`components/atoms/ThemedText.tsx`](file:///f:/bamboo/frontend/components/atoms/ThemedText.tsx) وأرشفة مجلد `components/ui` بالكامل في `legacy/components/ui/`.
-- [x] **1.H.4**: حل مشكلة عدم استجابة الـ Dark Mode اللحظية بإنشاء [`hooks/useDynamicTheme.ts`](file:///f:/bamboo/frontend/hooks/useDynamicTheme.ts) المستند مباشرة إلى `Appearance.addChangeListener` مع تزامن فوري في 0ms بين Navigation و Paper Provider و StatusBar.
-- [x] **1.H.5**: تفكيك [`app/_layout.tsx`](file:///f:/bamboo/frontend/app/_layout.tsx) وعزل الثيمات في [`constants/theme.ts`](file:///f:/bamboo/frontend/constants/theme.ts)، وحماية المسارات في [`hooks/useProtectedRoute.ts`](file:///f:/bamboo/frontend/hooks/useProtectedRoute.ts)، ومهام النظام في [`hooks/useAppBootstrap.ts`](file:///f:/bamboo/frontend/hooks/useAppBootstrap.ts).
-- [x] **1.H.6**: فحص الـ TypeScript بصفر أخطاء (`tsc --noEmit`) ونجاح 100% لاختبارات الـ Units.
+### 🎯 الحزمة 2.A: داتا بيز ونمذجة البيانات (Database Migrations & Models - ✅)
+- [x] **2.A.1**: إنشاء Migration لجدول `video_ratings` (مع Unique Index مركب على `[student_id, video_id]`) ونموذج `VideoRating.php`.
+- [x] **2.A.2**: إنشاء Migration لجدول `teacher_ratings` (مع Unique Index مركب على `[student_id, teacher_id]`) ونموذج `TeacherRating.php`.
+- [x] **2.A.3**: إنشاء Migration لجدول `video_encryption_keys` (حفظ مفاتيح AES-128 و IV و Hash) ونموذج `VideoEncryptionKey.php`.
+- [x] **2.A.4**: إنشاء Migration لتحديث جدول `videos` (إضافة `provider_type`, `hls_path`, `encryption_key_id`, `status`, `published_at`, `duration`).
+- [x] **2.A.5**: تشغيل المايجريشن والتحقق من سلامة الجداول في MySQL.
 
-### 🎯 الحزمة 1.I: خيارات الثيم الثلاثية ومستمع النظام الفوري (منجزة بالكامل ✅)
-- [x] **1.I.1**: بناء متجر الثيمات المستمر [`lib/store/themeStore.ts`](file:///f:/bamboo/frontend/lib/store/themeStore.ts) مع حفظ الخيار عبر `SecureStore`/`localStorage` بثلاثة أوضاع (`light`, `dark`, `system`).
-- [x] **1.I.2**: تحديث خطاف الثيم المباشر [`hooks/useDynamicTheme.ts`](file:///f:/bamboo/frontend/hooks/useDynamicTheme.ts) بالاشتراك في حدثي `Appearance.addChangeListener` و `AppState.change` للاستجابة اللحظية عند تغيير ثيم الهاتف من الـ Quick Settings دون إعادة تشغيل التطبيق.
-- [x] **1.I.3**: إنشاء كارت اختيار الثيم المخصص والحيوي [`components/molecules/ThemeSelectorCard.tsx`](file:///f:/bamboo/frontend/components/molecules/ThemeSelectorCard.tsx) ودمجه داخل شاشة تعديل الحساب `EditProfileScreen.tsx`.
-- [x] **1.I.4**: تحديث وثيقة الخطة العامة `REFACTOR_PLAN.md` بحزمة الرؤية المستقبلية للتصميم عالي الجودة (High Prime UI, Glassmorphism, Native Stack Headers).
-- [x] **1.I.5**: التحقق الكامل من الـ TypeScript بصفر أخطاء واجتياز 100% لاختبارات الوحدات.
+### 🎯 الحزمة 2.B: نمط استراتيجية مزودي الفيديوهات (Video Provider Strategy Pattern - ✅)
+- [x] **2.B.1**: إنشاء العقد `VideoProviderInterface` ونماذج نقل البيانات `PlaybackPayload` و `DownloadOption`.
+- [x] **2.B.2**: بناء استراتيجية `YouTubeVideoProvider` للتعامل مع الفيديوهات المجانية واستخراج الروابط.
+- [x] **2.B.3**: بناء استراتيجية `BackblazeB2VideoProvider` للتعامل مع تخزين B2 وتوليد توكنات JWT الموقعة وروابط التحميل المؤقتة.
+- [x] **2.B.4**: بناء استراتيجية `HlsStreamVideoProvider` لإعداد قوائم تشغيل m3u8 المحمية ونقاط تسليم مفاتيح التشفير.
+- [x] **2.B.5**: بناء `VideoProviderFactory` لربط الموديل تلقائياً بالمزود المناسب مع Fallback ذكي.
+
+### 🎯 الحزمة 2.C: الخدمات الأساسية والأمان الذري (Core Backend Services & FormRequests - ✅)
+- [x] **2.C.1**: بناء FormRequests الصارمة (`ValidateCodeRequest`, `RequestDownloadRequest`, `BatchTelemetryRequest`, `StoreRatingRequest`).
+- [x] **2.C.2**: بناء `CodeRedemptionService` مع القفل الذري `Cache::lock` لمنع مشاكل الـ Race Condition.
+- [x] **2.C.3**: بناء `VideoDeliveryService` لتسليم روابط المشاهدة والتحميل المفحوصة ومفاتيح التشفير.
+- [x] **2.C.4**: بناء `PreWarmedCatalogService` لمعالجة الكتالوج مسبقاً وتصحيح هيدرز HTTP 304 `Last-Modified`.
+- [x] **2.C.5**: بناء `TelemetryBatchService` وأوامر المعالجة الهادئة في أوقات الهدوء (`telemetry:drain`, `catalog:prewarm`).
+
+### 🎯 الحزمة 2.D: تنحيف الكنترولرز وبناء موارد الـ API (Thin Controllers & API Resources - ✅)
+- [x] **2.D.1**: بناء API Resources موحدة (`CatalogResource`, `VideoResource`, `TeacherResource`, `PlaybackResource`).
+- [x] **2.D.2**: إعادة هيكلة `CodeValidationController` ليصبح نحيفاً للغاية (109 سطراً) مفوضاً لـ `CodeRedemptionService`.
+- [x] **2.D.3**: إعادة هيكلة `CatalogController` للاعتماد على `PreWarmedCatalogService` وتطبيق كاش 304 بدقة (71 سطراً).
+- [x] **2.D.4**: إضافة نقاط النهاية الجديدة في `routes/api.php` (`/telemetry/batch`, `/video/{video}/playback`, `/video/keys/{keyHash}`, `/ratings`).
+
+### 🎯 الحزمة 2.E: الفحص والاختبار الشامل (Full Backend Verification - ✅)
+- [x] **2.E.1**: تشغيل فحص الـ Syntax الشامل لكافة ملفات الـ Backend بصفر أخطاء (`ALL PHP FILES PASSED SYNTAX CHECK WITH ZERO ERRORS`).
+- [x] **2.E.2**: إصلاح الخلل المزدوج في الـ Namespace بملف `ManageCategories.php` والـ Parse Error في `Jobx.php`.
+- [x] **2.E.3**: تشغيل حزمة اختبارات الـ Unit Tests (`VideoStrategyTest`, `CodeRedemptionTest`) واجتيازها بنجاح 100%.
+- [x] **2.E.4**: اعتماد المرحلة 2 والالتزام بالـ Commit في `backend` (`7f43a0f`).
 
 ---
 
 ## 📅 المرحلة التالية المباشرة
-- **المرحلة 2 (Laravel Backend & Edge-Zero Architecture)**:
-  1. بناء الـ Migrations لأعمدة الـ HLS ومفاتيح التشفير `video_encryption_keys` وجداول التقييمات `video_ratings` و `teacher_ratings`.
-  2. بناء محرك الكاش المسبق للمراحل (`Pre-Warmed Grade Snapshots`) لتسريع مزامنة الطلاب بدون استعلامات MySQL مجهدة.
-  3. بناء نقطة الاستقبال السريعة للتقييمات والتحليلات (`Batch Telemetry Ingestion`) عبر Redis Buffer.
-  4. بناء وتشغيل الكرون جوب في أوقات هدوء السيرفر المشترك لحساب المتوسطات وأرشفة سجلات الطلاب.
-  5. بناء خدمات التشفير والروابط الموقعة وتفعيل الأكواد المأمون (`CodeRedemptionService`, `VideoDeliveryService`, `VideoProcessingService`).
+- **المرحلة 3**: الداتا بيز المحلية بالموبايل والمزامنة الذكية (Drizzle ORM & Local SQLite Delta Sync & PRD Activity Widget).
