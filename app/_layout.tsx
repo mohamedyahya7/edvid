@@ -20,6 +20,7 @@ import { getSetting } from '@/lib/db/queries/settings.queries';
 import { findAndDeleteExpiredVideos } from '@/lib/db/queries/video.queries';
 import { useAppActions, useAppStore } from '@/lib/store';
 import { useAuthStore } from '@/lib/store/authStore';
+import { useThemeStore } from '@/lib/store/themeStore';
 import { downloadManager } from '@/services/DownloadManager';
 import { useDynamicTheme } from '@/hooks/useDynamicTheme';
 import { useProtectedRoute } from '@/hooks/useProtectedRoute';
@@ -124,9 +125,12 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  const hydrateTheme = useThemeStore((state) => state.hydrateTheme);
+
   useEffect(() => {
     hydrate();
-  }, [hydrate]);
+    hydrateTheme();
+  }, [hydrate, hydrateTheme]);
 
   if (!loaded || isHydrating) {
     return null;

@@ -16,6 +16,7 @@ import { useEditProfileController } from '@/hooks/useEditProfileController';
 import { ProfileHeroCard } from '@/components/molecules/ProfileHeroCard';
 import { ProfileFormFields } from '@/components/molecules/ProfileFormFields';
 import { ScreenHeaderBar } from '@/components/molecules/ScreenHeaderBar';
+import { ThemeSelectorCard } from '@/components/molecules/ThemeSelectorCard';
 
 export default function EditProfileScreen() {
   const { colors } = useTheme();
@@ -59,6 +60,9 @@ export default function EditProfileScreen() {
           copied={copied}
           onCopySupportId={handleCopySupportId}
         />
+
+        {/* Dynamic 3-Way Theme Switcher (Light / Dark / System) */}
+        <ThemeSelectorCard />
 
         <ProfileFormFields
           name={name}

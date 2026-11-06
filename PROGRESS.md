@@ -70,6 +70,13 @@
 - [x] **1.H.5**: تفكيك [`app/_layout.tsx`](file:///f:/bamboo/frontend/app/_layout.tsx) وعزل الثيمات في [`constants/theme.ts`](file:///f:/bamboo/frontend/constants/theme.ts)، وحماية المسارات في [`hooks/useProtectedRoute.ts`](file:///f:/bamboo/frontend/hooks/useProtectedRoute.ts)، ومهام النظام في [`hooks/useAppBootstrap.ts`](file:///f:/bamboo/frontend/hooks/useAppBootstrap.ts).
 - [x] **1.H.6**: فحص الـ TypeScript بصفر أخطاء (`tsc --noEmit`) ونجاح 100% لاختبارات الـ Units.
 
+### 🎯 الحزمة 1.I: خيارات الثيم الثلاثية ومستمع النظام الفوري (منجزة بالكامل ✅)
+- [x] **1.I.1**: بناء متجر الثيمات المستمر [`lib/store/themeStore.ts`](file:///f:/bamboo/frontend/lib/store/themeStore.ts) مع حفظ الخيار عبر `SecureStore`/`localStorage` بثلاثة أوضاع (`light`, `dark`, `system`).
+- [x] **1.I.2**: تحديث خطاف الثيم المباشر [`hooks/useDynamicTheme.ts`](file:///f:/bamboo/frontend/hooks/useDynamicTheme.ts) بالاشتراك في حدثي `Appearance.addChangeListener` و `AppState.change` للاستجابة اللحظية عند تغيير ثيم الهاتف من الـ Quick Settings دون إعادة تشغيل التطبيق.
+- [x] **1.I.3**: إنشاء كارت اختيار الثيم المخصص والحيوي [`components/molecules/ThemeSelectorCard.tsx`](file:///f:/bamboo/frontend/components/molecules/ThemeSelectorCard.tsx) ودمجه داخل شاشة تعديل الحساب `EditProfileScreen.tsx`.
+- [x] **1.I.4**: تحديث وثيقة الخطة العامة `REFACTOR_PLAN.md` بحزمة الرؤية المستقبلية للتصميم عالي الجودة (High Prime UI, Glassmorphism, Native Stack Headers).
+- [x] **1.I.5**: التحقق الكامل من الـ TypeScript بصفر أخطاء واجتياز 100% لاختبارات الوحدات.
+
 ---
 
 ## 📅 المرحلة التالية المباشرة
