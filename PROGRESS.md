@@ -82,6 +82,15 @@
 - [x] **2.E.3**: تشغيل حزمة اختبارات الـ Unit Tests (`VideoStrategyTest`, `CodeRedemptionTest`) واجتيازها بنجاح 100%.
 - [x] **2.E.4**: اعتماد المرحلة 2 والالتزام بالـ Commit في `backend` (`7f43a0f`).
 
+### 🎯 الحزمة 2.R: تحسينات الأمان وخوارزمية التفاعل وأحجام الجودات (Phase 2 Refinements - منجزة بالكامل ✅)
+- [x] **2.R.1**: تحديث سكريبت `get_links.py` لضمان حداثة `yt-dlp` وتمرير `player_client=['android', 'web']` واستخراج مدة الفيديو `duration` بالثواني تلقائياً وحفظها في الموديل.
+- [x] **2.R.2**: تحديث `CodeRedemptionService` لتقديم تدفق الـ One-Shot Direct Download عند وجود جودة واحدة مؤكدة، وتضمين أحجام الجودات `size_in_bytes` بدقة لمراعاة باقات الطلاب.
+- [x] **2.R.3**: إنشاء Migration لعمود `engagement_score` على جدولي `videos` و `teachers`، وإنشاء جدول `student_learning_profiles` لتخزين ملخص سلوك الطالب (سطر وحيد لكل طالب لخدمة مليون مستخدم).
+- [x] **2.R.4**: تطبيق خوارزمية مؤشر الجدارة التفاعلية (Engagement Score Formula) داخل `TelemetryBatchService` مع حساب معدل الإكمال وعدد التكرار والطلب التراكمي.
+- [x] **2.R.5**: تطهير `AuthController` من ثغرة User Enumeration وإحكام التسجيل داخل `DB::transaction` وإصلاح تسجيل الخروج لمسح التوكن الحالي فقط، وإزالة استعلامات $N+1$ من `StudentInteractionController`.
+- [x] **2.R.6**: كتابة وتشغيل الاختبارات الآلية الشاملة (`EngagementAlgorithmTest`, `VideoStrategyTest`, `CodeRedemptionTest`) واجتياز 11 فحصاً بنجاح 100%.
+- [x] **2.R.7**: اعتماد التحديثات والالتزام بالـ Commit في `backend` (`5498a06`).
+
 ---
 
 ## 📅 المرحلة التالية المباشرة
