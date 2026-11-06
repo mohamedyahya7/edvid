@@ -144,21 +144,34 @@ frontend/
 
 ---
 
-## 🗄️ المرحلة 2: تعديلات داتا بيز وخدمات Laravel (Database & Core Services)
+## 🗄️ المرحلة 2: تعديلات داتا بيز وخدمات Laravel ومعمارية Edge-Zero الكاشية
 *(الفرع القادم: `phase-2-laravel-backend`)*
-- [ ] إنشاء Migration لإضافة أعمدة الـ HLS وجدول `video_encryption_keys` وتصحيح `codes.expires_at`.
-- [ ] بناء `CodeRedemptionService` مع Atomic Locking.
-- [ ] بناء `VideoDeliveryService` لتسليم الـ Signed URLs والمفاتيح.
-- [ ] بناء `VideoProcessingService` بنمط Strategy Pattern.
+- [ ] **Migrations & Schema Normalization:**
+  - إضافة أعمدة الـ HLS وجدول `video_encryption_keys` وتصحيح `codes.expires_at`.
+  - إضافة جداول التقييمات: `video_ratings` و `teacher_ratings` لحساب متوسطات التقييم (1 إلى 5 نجوم).
+- [ ] **Pre-Warmed Grade Cache (كاش المراحل الدراسية المجهز مسبقاً):**
+  - تجهيز وتوليد لقطات دورية مكيشة بالكامل لكل مرحلة دراسية (`grade_{id}_catalog_snapshot`) في Redis / Cache.
+  - هدف المعمارية: عندما يفتح طالب (مثلاً الصف الثالث الإعدادي) التطبيق، يحصل على كامل المحتوى بـ Delta Sync من الكاش المجهز في ميلي ثانية واحدة دون تنفيذ استعلامات Relational متكررة على MySQL، لتخزينها محلياً في SQLite الطالب.
+- [ ] **Fast Telemetry & Ratings Ingestion Buffer:**
+  - بناء نقطة استقبال دفعات مجمعة (Batch Ingestion API) لتقييمات الطلاب وسجلات ثواني المشاهدة.
+  - حقن البيانات فوراً في Redis Queue / Staging Buffer والرد في أقل من 20ms دون لمس جداول MySQL الرئيسية أثناء ساعات الذروة.
+- [ ] **Idle-Time Worker / Nightly Cron (معالجة أوقات هدوء السيرفر المشترك):**
+  - جدولة معالجة التقييمات وإحصائيات الطلاب وحساب المتوسطات الموزونة في نافذة هدوء السيرفر (Server Idle Window)، مع الأخذ في الاعتبار مشاركة السيرفر مع أنظمة أخرى عبر تشغيل منخفض الأولوية (`low-priority background worker`).
+- [ ] **Core Backend Services:**
+  - بناء `CodeRedemptionService` مع Atomic Locking لمنع الـ Race Conditions.
+  - بناء `VideoDeliveryService` لتسليم الـ Signed URLs وروابط HLS والمفاتيح المحمية.
+  - بناء `VideoProcessingService` بنمط Strategy Pattern (دعم المعالجة المحلية / Bunny / VPS).
 
 ---
 
 ## ⚡ المرحلة 3: الداتا بيز المحلية بالموبايل والمزامنة (Drizzle ORM & Delta Sync)
 *(الفرع القادم: `phase-3-local-db-sync`)*
-- [ ] إعداد `Drizzle ORM` مع `expo-sqlite` بالـ Schema المطابقة لعقد الباك إند.
-- [ ] دمج وثيقة النشاط الأسبوعي ومعدل الإنجاز (`PRD_WEEKLY_ACTIVITY_WIDGET.md`) في جداول SQLite.
-- [ ] بناء محرك المزامنة الذكي (Pull/Push Delta Sync).
-- [ ] تشفير المفاتيح في `expo-secure-store`.
+- [ ] إعداد `Drizzle ORM` مع `expo-sqlite` بالـ Schema المطابقة لعقد الباك إند الجديد.
+- [ ] **Local Write-First Architecture (طابور العمليات المحلية للأوفلاين):**
+  - حفظ التقييمات (Likes / Ratings) وثواني المشاهدة محلياً في SQLite الطالب في 0ms مع تفاعل لحظي للواجهة بدون انتظار الإنترنت.
+  - تجميع العمليات ورفعها كـ Batch Payload مجمع كل عدة ساعات أو عند إغلاق التطبيق / الاتصال بالـ Wi-Fi.
+- [ ] دمج وثيقة النشاط الأسبوعي ومعدل الإنجاز (`PRD_WEEKLY_ACTIVITY_WIDGET.md`) في جداول SQLite المحلية لحساب إحصائيات المذاكرة دون استهلاك باندويث السيرفر.
+- [ ] تشفير المفاتيح والرموز الحساسة في `expo-secure-store`.
 
 ---
 

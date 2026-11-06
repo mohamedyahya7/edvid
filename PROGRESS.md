@@ -80,4 +80,9 @@
 ---
 
 ## 📅 المرحلة التالية المباشرة
-- **المرحلة 2**: داتا بيز وخدمات Laravel (Migrations + 3 Core Services).
+- **المرحلة 2 (Laravel Backend & Edge-Zero Architecture)**:
+  1. بناء الـ Migrations لأعمدة الـ HLS ومفاتيح التشفير `video_encryption_keys` وجداول التقييمات `video_ratings` و `teacher_ratings`.
+  2. بناء محرك الكاش المسبق للمراحل (`Pre-Warmed Grade Snapshots`) لتسريع مزامنة الطلاب بدون استعلامات MySQL مجهدة.
+  3. بناء نقطة الاستقبال السريعة للتقييمات والتحليلات (`Batch Telemetry Ingestion`) عبر Redis Buffer.
+  4. بناء وتشغيل الكرون جوب في أوقات هدوء السيرفر المشترك لحساب المتوسطات وأرشفة سجلات الطلاب.
+  5. بناء خدمات التشفير والروابط الموقعة وتفعيل الأكواد المأمون (`CodeRedemptionService`, `VideoDeliveryService`, `VideoProcessingService`).
